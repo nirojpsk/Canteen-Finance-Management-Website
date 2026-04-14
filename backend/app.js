@@ -3,6 +3,7 @@ import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import authRoutes from "./routes/authRoutes.js";
+import studentRoutes from "./routes/studentRoutes.js"; 
 import notFound from "./middlewares/notFoundMiddleware.js";
 import errorHandler from "./middlewares/errorMiddleware.js";
 
@@ -37,6 +38,8 @@ app.get("/", (req, res) => {
 // Auth Routes: yesko matlab chai authentication related routes lai handle garna ko lagi ho
 
 app.use("/api/auth", authRoutes);
+// Student Routes: yesko matlab chai student related routes lai handle garna ko lagi ho
+app.use("/api/students", studentRoutes);
 
 // Not Found Middleware: yesko matlab chai jaba client le invalid route ma request pathaune ho tyo handle garna ko lagi ho
 app.use(notFound);
