@@ -108,7 +108,42 @@ const getAdminProfile = async (req, res) => {
 
 const updateAdminProfile = async (req, res) => {
     try {
-        const { name, email, profilePicture } = req.body;
+        const { name, email, profilePicture, password, currentPassword, newPassword, confirmPassword } = req.body;
+
+        if (
+            password !== undefined ||
+            currentPassword !== undefined ||
+            newPassword !== undefined ||
+            confirmPassword !== undefined
+        ) {
+            return res.status(400).json({
+                message: "Password updates are not allowed on this route. Use /api/auth/change-password.",
+            });
+        }
+
+        if (name === undefined && email === undefined && profilePicture === undefined) {
+            return res.status(400).json({
+                message: "Please provide at least one profile field to update",
+            });
+        }
+
+        if (name !== undefined && typeof name !== "string") {
+            return res.status(400).json({
+                message: "Name must be a string",
+            });
+        }
+
+        if (email !== undefined && typeof email !== "string") {
+            return res.status(400).json({
+                message: "Email must be a string",
+            });
+        }
+
+        if (profilePicture !== undefined && typeof profilePicture !== "string") {
+            return res.status(400).json({
+                message: "Profile picture must be a string",
+            });
+        }
 
         const admin = await Admin.findById(req.admin._id);
 
@@ -118,8 +153,19 @@ const updateAdminProfile = async (req, res) => {
             });
         }
 
-        if (email && email.toLowerCase() !== admin.email) {
-            const existingAdmin = await Admin.findOne({ email: email.toLowerCase() });
+        const normalizedEmail = email !== undefined ? email.trim().toLowerCase() : undefined;
+
+        if (email !== undefined && !normalizedEmail) {
+            return res.status(400).json({
+                message: "Email cannot be empty",
+            });
+        }
+
+        if (normalizedEmail && normalizedEmail !== admin.email) {
+            const existingAdmin = await Admin.findOne({
+                email: normalizedEmail,
+                _id: { $ne: admin._id },
+            });
 
             if (existingAdmin) {
                 return res.status(400).json({
@@ -127,9 +173,19 @@ const updateAdminProfile = async (req, res) => {
                 });
             }
         }
-        admin.name = name || admin.name;
-        admin.email = email ? email.toLowerCase() : admin.email;
-        admin.ProfilePicture = profilePicture !== undefined ? profilePicture.trim() : admin.ProfilePicture;
+
+        if (name !== undefined) {
+            admin.name = name.trim() || admin.name;
+        }
+
+        if (normalizedEmail) {
+            admin.email = normalizedEmail;
+        }
+
+        if (profilePicture !== undefined) {
+            admin.ProfilePicture = profilePicture.trim();
+        }
+
         const updatedAdmin = await admin.save();
 
         return res.status(200).json({
