@@ -1,0 +1,48 @@
+import "dotenv/config";
+import express from "express";
+import cors from "cors";
+import cookieParser from "cookie-parser";
+import authRoutes from "./routes/authRoutes.js";
+import notFound from "./middlewares/notFoundMiddleware.js";
+import errorHandler from "./middlewares/errorMiddleware.js";
+
+const app = express();
+
+// Body parser middleware: yesko matlab chai client bata aune data lai parse garna ko lagi ho
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Cookie Parser Middleware: yesko matlab chai client bata aune cookies lai parse garna ko lagi ho
+
+app.use(cookieParser());
+
+// CORS Middleware: yesko matlab chai cross-origin requests lai allow garna ko lagi ho
+
+app.use(
+    cors({
+        origin: process.env.FRONTEND_URL || "http://localhost:5173",
+        credentials: true,
+    })
+);
+
+// Test Route: yesko matlab chai server chaliraheko cha ki nai bhanera test garna ko lagi ho
+
+app.get("/", (req, res) => {
+    res.status(200).json({
+        message: "Canteen Finance Management System API is running",
+    });
+});
+
+// Auth Routes: yesko matlab chai authentication related routes lai handle garna ko lagi ho
+
+app.use("/api/auth", authRoutes);
+
+// Not Found Middleware: yesko matlab chai jaba client le invalid route ma request pathaune ho tyo handle garna ko lagi ho
+app.use(notFound);
+
+// Error Handler Middleware: yesko matlab chai jaba server ma kunai error aune ho tyo handle garna ko lagi ho
+
+app.use(errorHandler);
+
+export default app;

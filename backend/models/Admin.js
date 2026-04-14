@@ -1,6 +1,5 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
-import { Profiler } from 'react';
 
 const adminSchema = new mongoose.Schema({
     name: {
