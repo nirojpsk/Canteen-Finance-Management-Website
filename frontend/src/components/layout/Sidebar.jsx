@@ -3,6 +3,7 @@ import { NavLink } from "react-router-dom";
 import {
   FiBarChart2,
   FiCreditCard,
+  FiLayers,
   FiHome,
   FiPlus,
   FiTrendingDown,
@@ -26,8 +27,10 @@ const Sidebar = () => (
       </span>
       <span>
         <strong>Canteen Finance</strong>
+        <small>Control Center</small>
       </span>
     </div>
+    <div className="sidebar-label">Workspace</div>
     <nav className="sidebar-nav" aria-label="Main navigation">
       {navItems.map((item) => (
         <NavLink key={item.to} to={item.to} className="sidebar-link">
@@ -40,6 +43,10 @@ const Sidebar = () => (
       <FiPlus aria-hidden="true" />
       <span>New Transaction</span>
     </NavLink>
+    <div className="sidebar-footnote" aria-label="Environment status">
+      <FiLayers aria-hidden="true" />
+      <span>Live analytics connected</span>
+    </div>
   </aside>
 );
 

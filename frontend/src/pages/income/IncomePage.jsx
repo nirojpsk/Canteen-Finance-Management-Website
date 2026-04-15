@@ -162,8 +162,8 @@ const IncomePage = () => {
         </div>
         <Card className="panel-card income-filter-card mb-3">
           <Card.Body>
-            <Row className="g-3 align-items-center">
-              <Col lg={5}>
+            <Row className="g-3 align-items-center filter-toolbar">
+              <Col md={6} lg={4}>
                 <Form.Control
                   name="search"
                   value={filters.search}
@@ -171,7 +171,7 @@ const IncomePage = () => {
                   placeholder="Search student, title, note"
                 />
               </Col>
-              <Col sm={6} lg={3}>
+              <Col sm={6} md={3} lg={3} className="filter-select-col">
                 <Form.Select
                   name="paymentMethod"
                   value={filters.paymentMethod}
@@ -185,7 +185,7 @@ const IncomePage = () => {
                   <option value="other">Other</option>
                 </Form.Select>
               </Col>
-              <Col sm={6} lg={3}>
+              <Col sm={6} md={3} lg={3} className="filter-select-col">
                 <Form.Select name="period" value={filters.period} onChange={handleFilterChange}>
                   <option value="">All time</option>
                   <option value="daily">Daily</option>
@@ -194,8 +194,11 @@ const IncomePage = () => {
                   <option value="yearly">Yearly</option>
                 </Form.Select>
               </Col>
-              <Col lg={1}>
-                <div className="income-filter-count">{incomes.length}</div>
+              <Col xs={12} sm={4} md={12} lg={2} className="filter-count-col">
+                <div className="income-filter-count table-count-pill">
+                  <strong>{incomes.length}</strong>
+                  <span>Rows</span>
+                </div>
               </Col>
             </Row>
           </Card.Body>
@@ -208,6 +211,7 @@ const IncomePage = () => {
           items={incomes}
           deletingId={deleteState.isLoading ? deleteId : ""}
           onDelete={setDeleteId}
+          isLoading={incomeQuery.isLoading}
         />
         <div className="ledger-footer">Showing current period transactions.</div>
       </section>

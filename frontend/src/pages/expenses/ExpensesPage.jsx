@@ -126,8 +126,8 @@ const ExpensesPage = () => {
             </div>
             <Card className="panel-card expense-filter-card mb-3">
               <Card.Body>
-                <Row className="g-3 align-items-center">
-                  <Col lg={5}>
+                <Row className="g-3 align-items-center filter-toolbar">
+                  <Col md={6} lg={4}>
                     <Form.Control
                       name="search"
                       value={filters.search}
@@ -135,7 +135,7 @@ const ExpensesPage = () => {
                       placeholder="Search title, category, note"
                     />
                   </Col>
-                  <Col sm={6} lg={3}>
+                  <Col sm={6} md={3} lg={3} className="filter-select-col">
                     <Form.Select
                       name="category"
                       value={filters.category}
@@ -149,7 +149,7 @@ const ExpensesPage = () => {
                       ))}
                     </Form.Select>
                   </Col>
-                  <Col sm={6} lg={3}>
+                  <Col sm={6} md={3} lg={3} className="filter-select-col">
                     <Form.Select name="period" value={filters.period} onChange={handleFilterChange}>
                       <option value="">All time</option>
                       <option value="daily">Daily</option>
@@ -158,8 +158,11 @@ const ExpensesPage = () => {
                       <option value="yearly">Yearly</option>
                     </Form.Select>
                   </Col>
-                  <Col lg={1}>
-                    <div className="expense-filter-count">{expenses.length}</div>
+                  <Col xs={12} sm={4} md={12} lg={2} className="filter-count-col">
+                    <div className="expense-filter-count table-count-pill">
+                      <strong>{expenses.length}</strong>
+                      <span>Rows</span>
+                    </div>
                   </Col>
                 </Row>
               </Card.Body>
@@ -168,7 +171,12 @@ const ExpensesPage = () => {
             <Message variant="danger">
               {expensesQuery.isError ? getErrorMessage(expensesQuery.error) : ""}
             </Message>
-            <ExpenseTable items={expenses} deletingId={deleteState.isLoading ? deleteId : ""} onDelete={setDeleteId} />
+            <ExpenseTable
+              items={expenses}
+              deletingId={deleteState.isLoading ? deleteId : ""}
+              onDelete={setDeleteId}
+              isLoading={expensesQuery.isLoading}
+            />
             <div className="ledger-footer">
               View full transaction history
               {expenseStats.latestExpense ? ` · Latest: ${formatDate(expenseStats.latestExpense.expenseDate)}` : ""}

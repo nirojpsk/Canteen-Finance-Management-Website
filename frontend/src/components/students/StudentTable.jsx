@@ -2,7 +2,7 @@ import Badge from "react-bootstrap/Badge";
 import Button from "react-bootstrap/Button";
 import Table from "react-bootstrap/Table";
 import { Link } from "react-router-dom";
-import { FiEdit2, FiEye, FiRefreshCw } from "react-icons/fi";
+import { FiEdit2, FiEye, FiRefreshCw, FiUsers } from "react-icons/fi";
 
 const getInitials = (name = "") =>
   name
@@ -13,7 +13,9 @@ const getInitials = (name = "") =>
     .join("")
     .toUpperCase() || "ST";
 
-const StudentTable = ({ students = [], onToggleStatus, togglingId = "" }) => (
+const skeletonRows = Array.from({ length: 5 }, (_, index) => index);
+
+const StudentTable = ({ students = [], onToggleStatus, togglingId = "", isLoading = false }) => (
   <Table responsive hover className="align-middle data-table student-table">
     <thead>
       <tr>
@@ -26,7 +28,16 @@ const StudentTable = ({ students = [], onToggleStatus, togglingId = "" }) => (
       </tr>
     </thead>
     <tbody>
-      {students.length ? (
+      {isLoading ? (
+        skeletonRows.map((row) => (
+          <tr key={`student-skeleton-${row}`} className="skeleton-row">
+            <td colSpan="6">
+              <span className="skeleton-line w-70" />
+              <span className="skeleton-line w-40 mt-2" />
+            </td>
+          </tr>
+        ))
+      ) : students.length ? (
         students.map((student) => (
           <tr key={student._id}>
             <td>
@@ -89,7 +100,13 @@ const StudentTable = ({ students = [], onToggleStatus, togglingId = "" }) => (
       ) : (
         <tr>
           <td colSpan="6" className="text-center text-muted py-4">
-            No students found
+            <div className="table-empty-state">
+              <FiUsers aria-hidden="true" />
+              <div>
+                <strong>No students found</strong>
+                <small>Try adjusting filters or add a new student profile.</small>
+              </div>
+            </div>
           </td>
         </tr>
       )}

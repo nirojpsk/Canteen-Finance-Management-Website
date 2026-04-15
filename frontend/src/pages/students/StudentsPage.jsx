@@ -92,8 +92,8 @@ const StudentsPage = () => {
         <div className="registry-panel">
           <Card className="panel-card filter-card">
             <Card.Body>
-              <Row className="g-3 align-items-end">
-                <Col lg={5}>
+              <Row className="g-3 align-items-end filter-toolbar">
+                <Col md={6} lg={4}>
                   <Form.Label>Search Registry</Form.Label>
                   <Form.Control
                     name="search"
@@ -102,7 +102,7 @@ const StudentsPage = () => {
                     placeholder="Search by name, roll, or phone"
                   />
                 </Col>
-                <Col sm={6} lg={3}>
+                <Col sm={6} md={3} lg={3} className="filter-select-col">
                   <Form.Label>Status</Form.Label>
                   <Form.Select name="status" value={filters.status} onChange={handleFilterChange}>
                     <option value="">All Status</option>
@@ -110,7 +110,7 @@ const StudentsPage = () => {
                     <option value="inactive">Inactive</option>
                   </Form.Select>
                 </Col>
-                <Col sm={6} lg={3}>
+                <Col sm={6} md={3} lg={3}>
                   <Form.Label>Class</Form.Label>
                   <Form.Control
                     name="className"
@@ -118,6 +118,12 @@ const StudentsPage = () => {
                     onChange={handleFilterChange}
                     placeholder="All Classes"
                   />
+                </Col>
+                <Col xs={12} sm={4} md={12} lg={2} className="filter-count-col">
+                  <div className="table-count-pill">
+                    <strong>{studentsQuery.data?.students?.length || 0}</strong>
+                    <span>Rows</span>
+                  </div>
                 </Col>
               </Row>
             </Card.Body>
@@ -132,6 +138,7 @@ const StudentsPage = () => {
               students={studentsQuery.data?.students || []}
               onToggleStatus={handleToggleStatus}
               togglingId={togglingId}
+              isLoading={studentsQuery.isLoading}
             />
             <div className="ledger-footer">
               Showing <strong>{studentsQuery.data?.students?.length || 0}</strong> students

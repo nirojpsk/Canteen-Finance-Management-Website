@@ -1,10 +1,12 @@
 import Button from "react-bootstrap/Button";
 import Table from "react-bootstrap/Table";
-import { FiSquare, FiTrash2 } from "react-icons/fi";
+import { FiSquare, FiTrash2, FiTrendingDown } from "react-icons/fi";
 import { formatCurrency } from "../../utils/formatCurrency";
 import { formatDate } from "../../utils/formatDate";
 
-const ExpenseTable = ({ items = [], deletingId = "", onDelete }) => (
+const skeletonRows = Array.from({ length: 5 }, (_, index) => index);
+
+const ExpenseTable = ({ items = [], deletingId = "", onDelete, isLoading = false }) => (
   <div className="expense-table-shell">
     <Table responsive hover className="align-middle data-table expense-table">
     <thead>
@@ -17,7 +19,16 @@ const ExpenseTable = ({ items = [], deletingId = "", onDelete }) => (
       </tr>
     </thead>
     <tbody>
-      {items.length ? (
+      {isLoading ? (
+        skeletonRows.map((row) => (
+          <tr key={`expense-skeleton-${row}`} className="skeleton-row">
+            <td colSpan="5">
+              <span className="skeleton-line w-72" />
+              <span className="skeleton-line w-38 mt-2" />
+            </td>
+          </tr>
+        ))
+      ) : items.length ? (
         items.map((item) => (
           <tr key={item._id}>
             <td>
@@ -55,7 +66,13 @@ const ExpenseTable = ({ items = [], deletingId = "", onDelete }) => (
       ) : (
         <tr>
           <td colSpan="5" className="text-center text-muted py-5 expense-empty-state">
-            No expenses found
+            <div className="table-empty-state">
+              <FiTrendingDown aria-hidden="true" />
+              <div>
+                <strong>No expenses found</strong>
+                <small>Logged expenses will appear once transactions are recorded.</small>
+              </div>
+            </div>
           </td>
         </tr>
       )}

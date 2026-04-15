@@ -1,6 +1,6 @@
 import Button from "react-bootstrap/Button";
 import Table from "react-bootstrap/Table";
-import { FiTrash2 } from "react-icons/fi";
+import { FiTrendingUp, FiTrash2 } from "react-icons/fi";
 import { formatCurrency } from "../../utils/formatCurrency";
 import { formatDate } from "../../utils/formatDate";
 
@@ -13,7 +13,9 @@ const getInitials = (name = "") =>
     .join("")
     .toUpperCase() || "IN";
 
-const IncomeTable = ({ items = [], deletingId = "", onDelete }) => (
+const skeletonRows = Array.from({ length: 5 }, (_, index) => index);
+
+const IncomeTable = ({ items = [], deletingId = "", onDelete, isLoading = false }) => (
   <div className="income-table-shell">
     <Table responsive hover className="align-middle data-table income-table">
       <thead>
@@ -27,7 +29,16 @@ const IncomeTable = ({ items = [], deletingId = "", onDelete }) => (
         </tr>
       </thead>
       <tbody>
-        {items.length ? (
+        {isLoading ? (
+          skeletonRows.map((row) => (
+            <tr key={`income-skeleton-${row}`} className="skeleton-row">
+              <td colSpan="6">
+                <span className="skeleton-line w-75" />
+                <span className="skeleton-line w-45 mt-2" />
+              </td>
+            </tr>
+          ))
+        ) : items.length ? (
           items.map((item) => (
             <tr key={item._id}>
               <td>
@@ -65,7 +76,13 @@ const IncomeTable = ({ items = [], deletingId = "", onDelete }) => (
         ) : (
           <tr>
             <td colSpan="6" className="text-center text-muted py-5 income-empty-state">
-              No income entries found
+              <div className="table-empty-state">
+                <FiTrendingUp aria-hidden="true" />
+                <div>
+                  <strong>No income entries found</strong>
+                  <small>Add a payment to start building your revenue history.</small>
+                </div>
+              </div>
             </td>
           </tr>
         )}

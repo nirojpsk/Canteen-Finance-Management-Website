@@ -3,10 +3,12 @@ import Form from "react-bootstrap/Form";
 import { Link } from "react-router-dom";
 import Loader from "../../components/common/Loader";
 import Message from "../../components/common/Message";
+import AnalyticsSection from "../../components/dashboard/AnalyticsSection";
 import RecentExpenseTable from "../../components/dashboard/RecentExpenseTable";
 import RecentIncomeTable from "../../components/dashboard/RecentIncomeTable";
 import SummaryCard from "../../components/dashboard/SummaryCard";
 import {
+  useGetDashboardOverviewQuery,
   useGetDashboardStatsByPeriodQuery,
   useGetDashboardSummaryQuery,
   useGetRecentTransactionsQuery,
@@ -19,6 +21,7 @@ const periodOptions = ["daily", "weekly", "monthly", "yearly"];
 const DashboardPage = () => {
   const [period, setPeriod] = useState("daily");
   const summaryQuery = useGetDashboardSummaryQuery();
+  const overviewQuery = useGetDashboardOverviewQuery();
   const statsQuery = useGetDashboardStatsByPeriodQuery(period);
   const recentQuery = useGetRecentTransactionsQuery();
 
@@ -32,6 +35,7 @@ const DashboardPage = () => {
     <section className="page-stack dashboard-screen">
       <div className="page-heading dashboard-heading">
         <div>
+          <p className="eyebrow">Live performance</p>
           <h2>Dashboard</h2>
           <p className="page-subtitle">Overview of canteen revenue, expenses, and student activity.</p>
         </div>
@@ -86,7 +90,7 @@ const DashboardPage = () => {
             </div>
             <Link to="/income">View All</Link>
           </div>
-          <RecentIncomeTable items={recentQuery.data?.recentIncome || []} />
+          <RecentIncomeTable items={recentQuery.data?.recentIncome || []} isLoading={recentQuery.isLoading} />
         </section>
         <section className="ledger-card">
           <div className="section-title-row">
@@ -96,11 +100,11 @@ const DashboardPage = () => {
             </div>
             <Link to="/expenses">View All</Link>
           </div>
-          <RecentExpenseTable items={recentQuery.data?.recentExpenses || []} />
+          <RecentExpenseTable items={recentQuery.data?.recentExpenses || []} isLoading={recentQuery.isLoading} />
         </section>
       </div>
 
-      <div className="period-strip">
+      <div className="period-strip dashboard-period-strip">
         <div>
           <p className="summary-label">Period Income</p>
           <strong>{formatCurrency(stats?.totalIncome)}</strong>
@@ -119,6 +123,11 @@ const DashboardPage = () => {
           </span>
         </div>
       </div>
+
+      {overviewQuery.isError ? (
+        <Message variant="danger">{getErrorMessage(overviewQuery.error, "Unable to load analytics graph data.")}</Message>
+      ) : null}
+      <AnalyticsSection overview={overviewQuery.data?.overview} />
     </section>
   );
 };
