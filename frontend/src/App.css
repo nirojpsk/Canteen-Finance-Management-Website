@@ -3477,3 +3477,486 @@ body::after {
     padding: 30px;
   }
 }
+
+@media (max-width: 640px) {
+  body {
+    overflow-x: hidden;
+  }
+
+  .admin-layout {
+    display: block;
+    min-height: 100vh;
+    padding: 0;
+  }
+
+  .admin-main {
+    min-height: 100vh;
+    border-radius: 0;
+    padding-bottom: 94px;
+  }
+
+  .content-area {
+    max-width: 100%;
+    padding: 18px 12px 112px;
+  }
+
+  .sidebar {
+    position: fixed;
+    inset: auto 10px 10px;
+    height: auto;
+    display: block;
+    padding: 8px;
+    border-radius: 18px;
+    z-index: 1100;
+  }
+
+  .brand,
+  .sidebar-label,
+  .sidebar-transaction,
+  .sidebar-footnote {
+    display: none;
+  }
+
+  .sidebar-nav {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 4px;
+  }
+
+  .sidebar-link {
+    min-height: 56px;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    padding: 6px 4px;
+    border-radius: 12px;
+    font-size: 10px;
+    line-height: 1.1;
+    text-align: center;
+  }
+
+  .sidebar-link::before {
+    display: none;
+  }
+
+  .sidebar-link svg {
+    width: 19px;
+    height: 19px;
+  }
+
+  .sidebar-link span {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+    padding: 12px;
+    border-width: 0 0 1px;
+    border-radius: 0 0 16px 16px;
+  }
+
+  .topbar-left {
+    flex: 1 1 auto;
+    width: auto;
+    min-width: 0;
+  }
+
+  .topbar h1 {
+    max-width: 100%;
+    overflow: hidden;
+    font-size: 20px;
+    line-height: 1.1;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .topbar-actions {
+    flex: 0 0 auto;
+    width: auto;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+
+  .topbar-period,
+  .topbar .icon-button[aria-label="Notifications"],
+  .admin-chip span {
+    display: none;
+  }
+
+  .theme-switcher {
+    min-height: 32px;
+  }
+
+  .theme-chip {
+    width: 28px;
+    height: 28px;
+  }
+
+  .admin-chip img,
+  .admin-chip > svg,
+  .logout-button {
+    width: 32px;
+    height: 32px;
+    min-height: 32px;
+  }
+
+  .page-stack {
+    gap: 18px;
+  }
+
+  .page-heading {
+    gap: 12px;
+  }
+
+  .page-heading h2,
+  .detail-heading h2 {
+    font-size: 32px;
+    line-height: 1.05;
+  }
+
+  .page-heading h2::after {
+    width: 48px;
+    height: 3px;
+  }
+
+  .page-subtitle {
+    margin-top: 10px;
+    font-size: 14px;
+  }
+
+  .eyebrow,
+  .form-label,
+  .summary-label,
+  .data-table th {
+    font-size: 10px;
+  }
+
+  .dashboard-metrics,
+  .dashboard-ledgers,
+  .dashboard-period-strip,
+  .finance-top-grid,
+  .expenses-grid,
+  .students-grid,
+  .profile-grid,
+  .student-detail-grid,
+  .edit-student-grid,
+  .student-detail-bottom,
+  .mini-stat-grid,
+  .income-hero-badges,
+  .ledger-summary-strip,
+  .profile-form-grid,
+  .profile-footnotes {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .summary-card {
+    min-height: auto;
+  }
+
+  .summary-card .card-body,
+  .registration-card .card-body,
+  .filter-card .card-body,
+  .finance-form-card .card-body,
+  .admin-profile-card .card-body,
+  .password-card .card-body,
+  .edit-profile-card .card-body,
+  .edit-form-card .card-body,
+  .identity-card .card-body,
+  .income-history-card .card-body,
+  .expense-ledger-card .card-body {
+    padding: 18px;
+  }
+
+  .summary-value,
+  .dashboard-metrics .summary-card:not(:first-child) .summary-value {
+    font-size: 24px;
+  }
+
+  .summary-helper {
+    margin-top: 12px;
+  }
+
+  .dashboard-period-strip > div,
+  .period-strip > div {
+    padding: 18px;
+  }
+
+  .period-strip strong,
+  .dashboard-period-strip > div strong {
+    font-size: 22px;
+  }
+
+  .section-title-row {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .section-title-row h3,
+  .finance-form-card h3,
+  .profile-card-header h3,
+  .security-heading h3,
+  .two-factor-card h3,
+  .archive-row h3,
+  .compliance-panel h3 {
+    font-size: 20px;
+  }
+
+  .section-title-row a,
+  .section-title-row .link-button {
+    align-self: flex-start;
+  }
+
+  .finance-form .row,
+  .filter-toolbar,
+  .dashboard-filter-toolbar {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .filter-toolbar > [class*="col-"]:first-child,
+  .dashboard-filter-toolbar > [class*="col-"]:first-child {
+    grid-column: auto;
+  }
+
+  .form-control,
+  .form-select {
+    min-height: 46px;
+    font-size: 16px;
+  }
+
+  textarea.form-control {
+    min-height: 118px;
+  }
+
+  .metric-pill,
+  .table-count-pill {
+    width: 100%;
+  }
+
+  .finance-form .btn,
+  .income-form-actions .btn,
+  .expense-form .btn,
+  .detail-actions .btn,
+  .archive-row .btn {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .finance-hero,
+  .insight-panel {
+    min-height: auto;
+    padding: 22px;
+  }
+
+  .finance-hero h3 {
+    font-size: 28px;
+  }
+
+  .mini-stat {
+    min-height: auto;
+    padding: 18px;
+  }
+
+  .analytics-card .card-body {
+    padding: 18px 14px 14px;
+  }
+
+  .analytics-heading {
+    flex-direction: column;
+  }
+
+  .analytics-controls {
+    width: 100%;
+    flex: none;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .analytics-controls .form-select {
+    width: 100%;
+  }
+
+  .analytics-chart-shell {
+    min-height: 260px;
+    padding: 8px;
+    overflow-x: auto;
+  }
+
+  .analytics-chart-shell > .recharts-responsive-container {
+    min-width: 520px;
+  }
+
+  .students-chart-wrap {
+    grid-template-columns: 1fr;
+  }
+
+  .students-chart-wrap > .recharts-responsive-container {
+    min-width: 0;
+  }
+
+  .students-chart-legend {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .table-responsive,
+  .income-table-shell,
+  .expense-table-shell,
+  .student-ledger .table-responsive {
+    max-width: 100%;
+    overflow-x: auto;
+    border-radius: 14px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .data-table {
+    min-width: 620px;
+    font-size: 12px;
+  }
+
+  .student-table {
+    min-width: 700px;
+  }
+
+  .data-table thead th {
+    padding: 12px 14px;
+  }
+
+  .data-table tbody td {
+    padding: 14px;
+  }
+
+  .identity-cell {
+    min-width: 150px;
+    gap: 10px;
+  }
+
+  .avatar {
+    width: 30px;
+    height: 30px;
+  }
+
+  .table-actions {
+    justify-content: flex-start;
+  }
+
+  .detail-actions,
+  .archive-row,
+  .history-total,
+  .profile-card-header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .detail-list {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+
+  .detail-list dt {
+    margin-top: 8px;
+  }
+
+  .note-card {
+    min-height: auto;
+    padding: 20px;
+  }
+
+  .income-history-card .period-select,
+  .income-history-card .d-flex {
+    width: 100%;
+  }
+
+  .income-history-card .d-flex {
+    flex-direction: column;
+  }
+
+  .history-total {
+    gap: 6px;
+    padding: 18px 0 0;
+  }
+
+  .history-total strong {
+    font-size: 22px;
+  }
+
+  .profile-footnotes {
+    margin-top: 28px;
+  }
+
+  .modal-dialog {
+    margin: 12px;
+  }
+
+  .confirmation-modal .modal-title {
+    font-size: 24px;
+  }
+
+  .confirmation-modal .modal-body {
+    font-size: 15px;
+  }
+
+  .confirmation-modal .modal-footer {
+    flex-direction: column-reverse;
+  }
+
+  .confirmation-modal .modal-footer .btn {
+    width: 100%;
+  }
+
+  .auth-screen {
+    padding: 16px;
+  }
+
+  .auth-card .card-body {
+    padding: 30px 22px 26px;
+  }
+
+  .auth-brand h1 {
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 420px) {
+  .content-area {
+    padding-right: 10px;
+    padding-left: 10px;
+  }
+
+  .topbar {
+    padding: 10px;
+  }
+
+  .theme-switcher {
+    display: none;
+  }
+
+  .sidebar {
+    inset: auto 8px 8px;
+  }
+
+  .sidebar-link {
+    min-height: 52px;
+    font-size: 9px;
+  }
+
+  .page-heading h2,
+  .detail-heading h2 {
+    font-size: 29px;
+  }
+
+  .students-chart-legend {
+    grid-template-columns: 1fr;
+  }
+}
