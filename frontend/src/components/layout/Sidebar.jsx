@@ -26,7 +26,6 @@ const Sidebar = () => (
       </span>
       <span>
         <strong>Canteen Finance</strong>
-        <small>Wealth Office</small>
       </span>
     </div>
     <nav className="sidebar-nav" aria-label="Main navigation">

@@ -3,7 +3,6 @@ import Card from "react-bootstrap/Card";
 import Col from "react-bootstrap/Col";
 import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
-import { FiAward, FiDownload, FiTrendingUp } from "react-icons/fi";
 import ConfirmationModal from "../../components/common/ConfirmationModal";
 import Loader from "../../components/common/Loader";
 import Message from "../../components/common/Message";
@@ -15,6 +14,7 @@ import {
   useGetAllExpensesQuery,
 } from "../../features/expenses/expenseApiSlice";
 import { formatCurrency } from "../../utils/formatCurrency";
+import { formatDate } from "../../utils/formatDate";
 import getErrorMessage from "../../utils/getErrorMessage";
 
 const categories = ["stock", "drinks", "gas", "salary", "rent", "electricity", "miscellaneous"];
@@ -33,6 +33,22 @@ const ExpensesPage = () => {
   const expensesQuery = useGetAllExpensesQuery(queryParams);
   const [createExpense, createState] = useCreateExpenseMutation();
   const [deleteExpense, deleteState] = useDeleteExpenseMutation();
+
+  const expenses = expensesQuery.data?.expenses || [];
+
+  const expenseStats = useMemo(() => {
+    const latestExpense = expenses.reduce((latest, entry) => {
+      const currentDate = new Date(entry.expenseDate || 0).getTime();
+      const latestDate = new Date(latest?.expenseDate || 0).getTime();
+      return currentDate > latestDate ? entry : latest;
+    }, expenses[0]);
+
+    return {
+      count: expenses.length,
+      averageExpense: expenses.length ? (expensesQuery.data?.totalExpense || 0) / expenses.length : 0,
+      latestExpense,
+    };
+  }, [expenses, expensesQuery.data?.totalExpense]);
 
   const handleFilterChange = (event) => {
     const { name, value } = event.target;
@@ -86,78 +102,79 @@ const ExpensesPage = () => {
         </Card>
 
         <div className="expense-ledger-column">
-          <section className="finance-hero finance-hero-expense">
-            <h3>Financial Transparency</h3>
-            <p>Real-time expenditure tracking for the current fiscal quarter.</p>
-          </section>
-
-          <section className="ledger-card">
+          <Card className="panel-card ledger-card expense-ledger-card">
+            <Card.Body>
             <div className="section-title-row">
               <div>
                 <h3>Recent Ledger</h3>
+                <p>Latest entries and fast filters for expense review.</p>
               </div>
-              <button type="button" className="link-button">
-                <FiDownload aria-hidden="true" />
-                Export PDF
-              </button>
+              <div className="ledger-summary-strip">
+                <div>
+                  <span>Entries</span>
+                  <strong>{expenseStats.count}</strong>
+                </div>
+                <div>
+                  <span>Burn</span>
+                  <strong>{formatCurrency(expensesQuery.data?.totalExpense)}</strong>
+                </div>
+                <div>
+                  <span>Avg.</span>
+                  <strong>{formatCurrency(expenseStats.averageExpense)}</strong>
+                </div>
+              </div>
             </div>
-            <Row className="g-3 mb-3">
-              <Col md={5}>
-                <Form.Control
-                  name="search"
-                  value={filters.search}
-                  onChange={handleFilterChange}
-                  placeholder="Search title, category, note"
-                />
-              </Col>
-              <Col md={3}>
-                <Form.Select
-                  name="category"
-                  value={filters.category}
-                  onChange={handleFilterChange}
-                >
-                  <option value="">All categories</option>
-                  {categories.map((category) => (
-                    <option key={category} value={category}>
-                      {category[0].toUpperCase() + category.slice(1)}
-                    </option>
-                  ))}
-                </Form.Select>
-              </Col>
-              <Col md={4}>
-                <Form.Select name="period" value={filters.period} onChange={handleFilterChange}>
-                  <option value="">All time</option>
-                  <option value="daily">Daily</option>
-                  <option value="weekly">Weekly</option>
-                  <option value="monthly">Monthly</option>
-                  <option value="yearly">Yearly</option>
-                </Form.Select>
-              </Col>
-            </Row>
+            <Card className="panel-card expense-filter-card mb-3">
+              <Card.Body>
+                <Row className="g-3 align-items-center">
+                  <Col lg={5}>
+                    <Form.Control
+                      name="search"
+                      value={filters.search}
+                      onChange={handleFilterChange}
+                      placeholder="Search title, category, note"
+                    />
+                  </Col>
+                  <Col sm={6} lg={3}>
+                    <Form.Select
+                      name="category"
+                      value={filters.category}
+                      onChange={handleFilterChange}
+                    >
+                      <option value="">All categories</option>
+                      {categories.map((category) => (
+                        <option key={category} value={category}>
+                          {category[0].toUpperCase() + category.slice(1)}
+                        </option>
+                      ))}
+                    </Form.Select>
+                  </Col>
+                  <Col sm={6} lg={3}>
+                    <Form.Select name="period" value={filters.period} onChange={handleFilterChange}>
+                      <option value="">All time</option>
+                      <option value="daily">Daily</option>
+                      <option value="weekly">Weekly</option>
+                      <option value="monthly">Monthly</option>
+                      <option value="yearly">Yearly</option>
+                    </Form.Select>
+                  </Col>
+                  <Col lg={1}>
+                    <div className="expense-filter-count">{expenses.length}</div>
+                  </Col>
+                </Row>
+              </Card.Body>
+            </Card>
             {expensesQuery.isLoading ? <Loader /> : null}
             <Message variant="danger">
               {expensesQuery.isError ? getErrorMessage(expensesQuery.error) : ""}
             </Message>
-            <ExpenseTable
-              items={expensesQuery.data?.expenses || []}
-              deletingId={deleteState.isLoading ? deleteId : ""}
-              onDelete={setDeleteId}
-            />
-            <div className="ledger-footer">View full transaction history</div>
-          </section>
-
-          <div className="mini-stat-grid expense-stats">
-            <div className="mini-stat">
-              <FiTrendingUp aria-hidden="true" />
-              <span>MoM Increase</span>
-              <strong>+12.4%</strong>
+            <ExpenseTable items={expenses} deletingId={deleteState.isLoading ? deleteId : ""} onDelete={setDeleteId} />
+            <div className="ledger-footer">
+              View full transaction history
+              {expenseStats.latestExpense ? ` · Latest: ${formatDate(expenseStats.latestExpense.expenseDate)}` : ""}
             </div>
-            <div className="mini-stat">
-              <FiAward aria-hidden="true" />
-              <span>Audited Status</span>
-              <strong>Verified</strong>
-            </div>
-          </div>
+            </Card.Body>
+          </Card>
         </div>
       </div>
 

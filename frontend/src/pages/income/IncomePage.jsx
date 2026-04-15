@@ -3,7 +3,6 @@ import Card from "react-bootstrap/Card";
 import Col from "react-bootstrap/Col";
 import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
-import { FiDownload, FiFilter, FiShield, FiTrendingUp } from "react-icons/fi";
 import ConfirmationModal from "../../components/common/ConfirmationModal";
 import Loader from "../../components/common/Loader";
 import Message from "../../components/common/Message";
@@ -16,7 +15,9 @@ import {
 } from "../../features/income/incomeApiSlice";
 import { useGetAllStudentsQuery } from "../../features/students/studentApiSlice";
 import { formatCurrency } from "../../utils/formatCurrency";
+import { formatDate } from "../../utils/formatDate";
 import getErrorMessage from "../../utils/getErrorMessage";
+import { FiCalendar, FiCreditCard, FiTrendingUp, FiUsers } from "react-icons/fi";
 
 const IncomePage = () => {
   const [filters, setFilters] = useState({ search: "", paymentMethod: "", period: "" });
@@ -33,6 +34,22 @@ const IncomePage = () => {
   const studentsQuery = useGetAllStudentsQuery({ status: "active" });
   const [createIncome, createState] = useCreateIncomeMutation();
   const [deleteIncome, deleteState] = useDeleteIncomeMutation();
+
+  const incomes = incomeQuery.data?.incomes || [];
+
+  const incomeStats = useMemo(() => {
+    const latestIncome = incomes.reduce((latest, entry) => {
+      const currentDate = new Date(entry.incomeDate || 0).getTime();
+      const latestDate = new Date(latest?.incomeDate || 0).getTime();
+      return currentDate > latestDate ? entry : latest;
+    }, incomes[0]);
+
+    return {
+      count: incomes.length,
+      averageIncome: incomes.length ? (incomeQuery.data?.totalIncome || 0) / incomes.length : 0,
+      latestIncome,
+    };
+  }, [incomeQuery.data?.totalIncome, incomes]);
 
   const handleFilterChange = (event) => {
     const { name, value } = event.target;
@@ -89,21 +106,49 @@ const IncomePage = () => {
         </Card>
 
         <div className="finance-visual-stack">
-          <section className="finance-hero finance-hero-income">
-            <span>Current Quarter</span>
-            <h3>Fiscal Clarity.</h3>
-          </section>
+          <Card className="finance-hero finance-hero-income">
+            <span>Income overview</span>
+            <h3>{formatCurrency(incomeQuery.data?.totalIncome)}</h3>
+            <p>
+              Track incoming payments, review recent receipts, and keep your canteen accounts clean.
+            </p>
+            <div className="income-hero-badges">
+              <div>
+                <strong>{incomeStats.count}</strong>
+                <span>Transactions</span>
+              </div>
+              <div>
+                <strong>{studentsQuery.data?.students?.length || 0}</strong>
+                <span>Active students</span>
+              </div>
+              <div>
+                <strong>{formatCurrency(incomeStats.averageIncome)}</strong>
+                <span>Average payment</span>
+              </div>
+            </div>
+          </Card>
+
           <div className="mini-stat-grid">
-            <div className="mini-stat">
+            <Card className="mini-stat">
+              <FiCreditCard aria-hidden="true" />
+              <span>Collected total</span>
+              <strong>{formatCurrency(incomeQuery.data?.totalIncome)}</strong>
+            </Card>
+            <Card className="mini-stat">
+              <FiUsers aria-hidden="true" />
+              <span>Students tracked</span>
+              <strong>{studentsQuery.data?.students?.length || 0}</strong>
+            </Card>
+            <Card className="mini-stat">
               <FiTrendingUp aria-hidden="true" />
-              <span>Growth vs Prev Month</span>
-              <strong>+12.4%</strong>
-            </div>
-            <div className="mini-stat">
-              <FiShield aria-hidden="true" />
-              <span>Settled Transactions</span>
-              <strong>{incomeQuery.data?.incomes?.length || 0}</strong>
-            </div>
+              <span>Entries logged</span>
+              <strong>{incomeStats.count}</strong>
+            </Card>
+            <Card className="mini-stat">
+              <FiCalendar aria-hidden="true" />
+              <span>Latest income</span>
+              <strong>{incomeStats.latestIncome ? formatDate(incomeStats.latestIncome.incomeDate) : "-"}</strong>
+            </Card>
           </div>
         </div>
       </div>
@@ -114,56 +159,53 @@ const IncomePage = () => {
             <h3>Transaction Log</h3>
             <p>Historical record of all canteen income.</p>
           </div>
-          <div className="ledger-tools">
-            <button type="button">
-              <FiFilter aria-hidden="true" />
-              Filter
-            </button>
-            <button type="button">
-              <FiDownload aria-hidden="true" />
-              Export
-            </button>
-          </div>
         </div>
-        <Row className="g-3 mb-3">
-          <Col md={5}>
-            <Form.Control
-              name="search"
-              value={filters.search}
-              onChange={handleFilterChange}
-              placeholder="Search student, title, note"
-            />
-          </Col>
-          <Col md={3}>
-            <Form.Select
-              name="paymentMethod"
-              value={filters.paymentMethod}
-              onChange={handleFilterChange}
-            >
-              <option value="">All methods</option>
-              <option value="cash">Cash</option>
-              <option value="esewa">Esewa</option>
-              <option value="khalti">Khalti</option>
-              <option value="bank">Bank</option>
-              <option value="other">Other</option>
-            </Form.Select>
-          </Col>
-          <Col md={4}>
-            <Form.Select name="period" value={filters.period} onChange={handleFilterChange}>
-              <option value="">All time</option>
-              <option value="daily">Daily</option>
-              <option value="weekly">Weekly</option>
-              <option value="monthly">Monthly</option>
-              <option value="yearly">Yearly</option>
-            </Form.Select>
-          </Col>
-        </Row>
+        <Card className="panel-card income-filter-card mb-3">
+          <Card.Body>
+            <Row className="g-3 align-items-center">
+              <Col lg={5}>
+                <Form.Control
+                  name="search"
+                  value={filters.search}
+                  onChange={handleFilterChange}
+                  placeholder="Search student, title, note"
+                />
+              </Col>
+              <Col sm={6} lg={3}>
+                <Form.Select
+                  name="paymentMethod"
+                  value={filters.paymentMethod}
+                  onChange={handleFilterChange}
+                >
+                  <option value="">All methods</option>
+                  <option value="cash">Cash</option>
+                  <option value="esewa">Esewa</option>
+                  <option value="khalti">Khalti</option>
+                  <option value="bank">Bank</option>
+                  <option value="other">Other</option>
+                </Form.Select>
+              </Col>
+              <Col sm={6} lg={3}>
+                <Form.Select name="period" value={filters.period} onChange={handleFilterChange}>
+                  <option value="">All time</option>
+                  <option value="daily">Daily</option>
+                  <option value="weekly">Weekly</option>
+                  <option value="monthly">Monthly</option>
+                  <option value="yearly">Yearly</option>
+                </Form.Select>
+              </Col>
+              <Col lg={1}>
+                <div className="income-filter-count">{incomes.length}</div>
+              </Col>
+            </Row>
+          </Card.Body>
+        </Card>
         {incomeQuery.isLoading ? <Loader /> : null}
         <Message variant="danger">
           {incomeQuery.isError ? getErrorMessage(incomeQuery.error) : ""}
         </Message>
         <IncomeTable
-          items={incomeQuery.data?.incomes || []}
+          items={incomes}
           deletingId={deleteState.isLoading ? deleteId : ""}
           onDelete={setDeleteId}
         />

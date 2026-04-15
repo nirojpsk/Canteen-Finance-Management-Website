@@ -112,22 +112,6 @@ const StudentDetailsPage = () => {
         </Card>
       </div>
 
-      <div className="student-detail-bottom">
-        <section className="campus-panel">
-          <span>Campus Records Office</span>
-        </section>
-        <section className="compliance-panel">
-          <h3>Financial Health & Compliance</h3>
-          <p>
-            This account maintains stable payment activity and remains cleared through the current
-            fiscal quarter.
-          </p>
-          <div className="compliance-stats">
-            <span><strong>100%</strong> Payment Ratio</span>
-            <span><strong>A+</strong> Internal Rating</span>
-          </div>
-        </section>
-      </div>
     </section>
   );
 };

@@ -3,7 +3,7 @@ import Card from "react-bootstrap/Card";
 import Col from "react-bootstrap/Col";
 import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
-import { FiFilter, FiUserPlus } from "react-icons/fi";
+import { FiUserPlus } from "react-icons/fi";
 import Loader from "../../components/common/Loader";
 import Message from "../../components/common/Message";
 import StudentForm from "../../components/students/StudentForm";
@@ -118,11 +118,6 @@ const StudentsPage = () => {
                     onChange={handleFilterChange}
                     placeholder="All Classes"
                   />
-                </Col>
-                <Col lg={1}>
-                  <button className="filter-icon-button" type="button" aria-label="Filter">
-                    <FiFilter aria-hidden="true" />
-                  </button>
                 </Col>
               </Row>
             </Card.Body>

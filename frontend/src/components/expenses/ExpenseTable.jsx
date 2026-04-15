@@ -5,7 +5,8 @@ import { formatCurrency } from "../../utils/formatCurrency";
 import { formatDate } from "../../utils/formatDate";
 
 const ExpenseTable = ({ items = [], deletingId = "", onDelete }) => (
-  <Table responsive hover className="align-middle data-table">
+  <div className="expense-table-shell">
+    <Table responsive hover className="align-middle data-table expense-table">
     <thead>
       <tr>
         <th>Title</th>
@@ -53,13 +54,14 @@ const ExpenseTable = ({ items = [], deletingId = "", onDelete }) => (
         ))
       ) : (
         <tr>
-          <td colSpan="5" className="text-center text-muted py-4">
+          <td colSpan="5" className="text-center text-muted py-5 expense-empty-state">
             No expenses found
           </td>
         </tr>
       )}
     </tbody>
   </Table>
+  </div>
 );
 
 export default ExpenseTable;

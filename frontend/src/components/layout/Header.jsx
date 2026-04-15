@@ -3,19 +3,11 @@ import { useSelector } from "react-redux";
 import { NavLink, useLocation } from "react-router-dom";
 import {
   FiBell,
-  FiCalendar,
-  FiChevronDown,
   FiLogOut,
   FiSearch,
   FiUser,
 } from "react-icons/fi";
 import { useLogoutAdminMutation } from "../../features/auth/authApiSlice";
-
-const tabs = [
-  { to: "/dashboard", label: "Analytics" },
-  { to: "/income", label: "Reports" },
-  { to: "/profile", label: "Settings" },
-];
 
 const getTitle = (pathname) => {
   if (pathname.startsWith("/students/") && pathname.endsWith("/edit")) return "Edit Student";
@@ -47,22 +39,8 @@ const Header = () => {
         ) : (
           <h1>{getTitle(pathname)}</h1>
         )}
-        <nav className="topbar-tabs" aria-label="Workspace tabs">
-          {tabs.map((tab) => (
-            <NavLink key={tab.to} to={tab.to}>
-              {tab.label}
-            </NavLink>
-          ))}
-        </nav>
       </div>
       <div className="topbar-actions">
-        {pathname.startsWith("/dashboard") ? (
-          <button className="topbar-period" type="button">
-            <FiCalendar aria-hidden="true" />
-            <span>Last 30 Days</span>
-            <FiChevronDown aria-hidden="true" />
-          </button>
-        ) : null}
         <button className="icon-button" type="button" aria-label="Notifications">
           <FiBell aria-hidden="true" />
         </button>

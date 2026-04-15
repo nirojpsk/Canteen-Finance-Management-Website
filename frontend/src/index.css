@@ -1,26 +1,25 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap");
 
 :root {
-  --app-bg: #f7f6fb;
+  --app-bg: #f8fafc;
   --panel-bg: #ffffff;
-  --ink: #0a0e18;
-  --text-main: #1d2230;
-  --text-muted: #687084;
-  --text-light: #8c92a1;
-  --border-soft: rgba(16, 20, 34, 0.08);
-  --amber: #f5a71c;
-  --amber-dark: #9a641c;
-  --green: #21a373;
-  --red: #cd3a44;
-  --radius: 8px;
-  --radius-lg: 8px;
-  --shadow-card: 0 18px 44px rgba(17, 20, 32, 0.045);
-  --font-display: "Manrope", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
-    "Segoe UI", sans-serif;
-  --font-body: "Manrope", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
-    "Segoe UI", sans-serif;
-  --font-label: "Inter", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
-    "Segoe UI", sans-serif;
+  --ink: #0f172a;
+  --text-main: #334155;
+  --text-muted: #64748b;
+  --text-light: #94a3b8;
+  --border-soft: rgba(15, 23, 42, 0.06);
+  --amber: #f59e0b;
+  --amber-dark: #b45309;
+  --green: #10b981;
+  --red: #ef4444;
+  --blue: #3b82f6;
+  --radius: 12px;
+  --radius-lg: 16px;
+  --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+  --shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --font-display: "Manrope", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-body: "Inter", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-label: "Inter", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   font-family: var(--font-body);
   color: var(--text-main);
   background: var(--app-bg);

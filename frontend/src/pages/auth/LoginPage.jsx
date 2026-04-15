@@ -51,11 +51,6 @@ const LoginPage = () => {
               <FiCreditCard aria-hidden="true" />
             </span>
             <h1>Canteen Finance</h1>
-            <p>Wealth Office Portal</p>
-          </div>
-          <div className="auth-status">
-            <FiShield aria-hidden="true" />
-            <span>Encrypted Session Active</span>
           </div>
           <Message variant="danger">{errorMessage}</Message>
           <Form className="auth-form" onSubmit={handleSubmit}>
@@ -77,7 +72,6 @@ const LoginPage = () => {
             <Form.Group className="mb-4" controlId="password">
               <div className="form-label-row">
                 <Form.Label>Password</Form.Label>
-                <button type="button">Recover Access</button>
               </div>
               <div className="input-with-icon">
                 <Form.Control
@@ -91,21 +85,10 @@ const LoginPage = () => {
                 <FiLock aria-hidden="true" />
               </div>
             </Form.Group>
-            <Button type="submit" className="w-100" disabled={isLoading}>
+<Button type="submit" className="w-100" disabled={isLoading}>
               {isLoading ? "Signing in..." : "Sign in"}
             </Button>
-            <Button type="button" variant="secondary" className="w-100 auth-sso">
-              <span aria-hidden="true" />
-              Sign in with SSO
-            </Button>
           </Form>
-          <p className="auth-fineprint">
-            By accessing this terminal, you agree to the Canteen Finance Security Protocols and
-            Data Mandates.
-          </p>
-          <span className="auth-rail" aria-hidden="true">
-            Private Wealth Infrastructure
-          </span>
         </Card.Body>
       </Card>
     </main>

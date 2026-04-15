@@ -59,7 +59,7 @@ const IncomeForm = ({ students = [], isLoading = false, onSubmit }) => {
             </Form.Select>
           </Form.Group>
         </Col>
-        <Col md={3}>
+        <Col md={4}>
           <Form.Group controlId="title">
             <Form.Label>Title / Description</Form.Label>
             <Form.Control
@@ -84,7 +84,7 @@ const IncomeForm = ({ students = [], isLoading = false, onSubmit }) => {
             />
           </Form.Group>
         </Col>
-        <Col md={3}>
+        <Col md={2}>
           <Form.Group controlId="paymentMethod">
             <Form.Label>Method</Form.Label>
             <Form.Select
@@ -100,7 +100,7 @@ const IncomeForm = ({ students = [], isLoading = false, onSubmit }) => {
             </Form.Select>
           </Form.Group>
         </Col>
-        <Col md={3}>
+        <Col md={4}>
           <Form.Group controlId="incomeDate">
             <Form.Label>Date</Form.Label>
             <Form.Control
@@ -112,7 +112,7 @@ const IncomeForm = ({ students = [], isLoading = false, onSubmit }) => {
             />
           </Form.Group>
         </Col>
-        <Col md={9}>
+        <Col md={8}>
           <Form.Group controlId="incomeNote">
             <Form.Label>Note (optional)</Form.Label>
             <Form.Control
@@ -126,9 +126,9 @@ const IncomeForm = ({ students = [], isLoading = false, onSubmit }) => {
           </Form.Group>
         </Col>
       </Row>
-      <div className="mt-4">
+      <div className="mt-4 income-form-actions">
         <Button type="submit" disabled={isLoading}>
-          {isLoading ? "Saving..." : "Confirm Income Entry"}
+          {isLoading ? "Saving..." : "Save Income"}
         </Button>
       </div>
     </Form>

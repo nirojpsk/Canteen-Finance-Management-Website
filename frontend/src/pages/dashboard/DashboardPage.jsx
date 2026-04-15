@@ -1,7 +1,6 @@
 import { useState } from "react";
 import Form from "react-bootstrap/Form";
 import { Link } from "react-router-dom";
-import { FiArrowUpRight, FiDownload } from "react-icons/fi";
 import Loader from "../../components/common/Loader";
 import Message from "../../components/common/Message";
 import RecentExpenseTable from "../../components/dashboard/RecentExpenseTable";
@@ -33,9 +32,8 @@ const DashboardPage = () => {
     <section className="page-stack dashboard-screen">
       <div className="page-heading dashboard-heading">
         <div>
-          <p className="eyebrow">Overview</p>
-          <h2>Financial Command</h2>
-          <p className="page-subtitle">Live canteen revenue, student activity, and operating cost posture.</p>
+          <h2>Dashboard</h2>
+          <p className="page-subtitle">Overview of canteen revenue, expenses, and student activity.</p>
         </div>
         <Form.Select
           className="period-select"
@@ -61,7 +59,6 @@ const DashboardPage = () => {
           label="Net Profit"
           value={formatCurrency(netProfit)}
           tone={(netProfit ?? 0) >= 0 ? "primary" : "danger"}
-          helper={<><FiArrowUpRight aria-hidden="true" /> +12.4% from last period</>}
         />
         <SummaryCard
           label="Total Students"
@@ -72,13 +69,11 @@ const DashboardPage = () => {
           label="Total Income"
           value={formatCurrency(totalIncome)}
           tone="success"
-          helper="Top revenue source: fees"
         />
         <SummaryCard
           label="Total Expenses"
           value={formatCurrency(totalExpenses)}
           tone="danger"
-          helper="8% over budget"
         />
       </div>
 
@@ -104,21 +99,6 @@ const DashboardPage = () => {
           <RecentExpenseTable items={recentQuery.data?.recentExpenses || []} />
         </section>
       </div>
-
-      <section className="insight-panel">
-        <div>
-          <span>Premium Insights</span>
-          <h3>Your financial trajectory is looking exceptional.</h3>
-          <p>
-            Students active entries and receipts are trending above the selected period. Current
-            net profit is projected to stay positive if expense velocity remains steady.
-          </p>
-          <Link to="/income" className="btn btn-light">
-            <FiDownload aria-hidden="true" />
-            Download Full Audit
-          </Link>
-        </div>
-      </section>
 
       <div className="period-strip">
         <div>

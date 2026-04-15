@@ -3,7 +3,7 @@ import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
 import Form from "react-bootstrap/Form";
 import { useSelector } from "react-redux";
-import { FiCamera, FiCheckCircle, FiKey, FiMapPin, FiShield } from "react-icons/fi";
+import { FiCamera, FiCheckCircle, FiKey, FiShield } from "react-icons/fi";
 import Message from "../../components/common/Message";
 import {
   useChangeAdminPasswordMutation,
@@ -120,20 +120,6 @@ const ProfilePage = () => {
                   onChange={handleProfileChange}
                   required
                 />
-              </Form.Group>
-              <Form.Group controlId="profileRole">
-                <Form.Label>Role</Form.Label>
-                <div className="static-field">
-                  <FiShield aria-hidden="true" />
-                  <span>Senior Wealth Administrator</span>
-                </div>
-              </Form.Group>
-              <Form.Group controlId="officeLocation">
-                <Form.Label>Office Location</Form.Label>
-                <div className="static-field">
-                  <FiMapPin aria-hidden="true" />
-                  <span>Canteen Office</span>
-                </div>
               </Form.Group>
               <Form.Group className="profile-picture-field" controlId="profilePicture">
                 <Form.Label>Profile picture URL</Form.Label>
