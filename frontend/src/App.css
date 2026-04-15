@@ -3204,6 +3204,90 @@ body::after {
   overflow-wrap: anywhere;
 }
 
+.finance-form .row,
+.filter-toolbar {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 170px), 1fr));
+  align-items: end;
+  margin: 0;
+  --bs-gutter-x: 0;
+  --bs-gutter-y: 0;
+}
+
+.finance-form .row {
+  gap: 18px 16px;
+}
+
+.filter-toolbar {
+  gap: 16px;
+}
+
+.finance-form .row > [class*="col-"],
+.filter-toolbar > [class*="col-"] {
+  width: 100%;
+  max-width: none;
+  min-width: 0;
+  padding-right: 0;
+  padding-left: 0;
+}
+
+.finance-form .row > [class*="col-"]:has(textarea),
+.filter-toolbar > [class*="col-"]:first-child {
+  grid-column: 1 / -1;
+}
+
+.finance-form .form-group {
+  min-width: 0;
+  padding: 0;
+}
+
+.finance-form .form-label,
+.filter-toolbar .form-label {
+  max-width: 100%;
+  min-height: 18px;
+  display: block;
+  margin-bottom: 10px;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+.finance-form .form-control,
+.finance-form .form-select,
+.filter-toolbar .form-control,
+.filter-toolbar .form-select {
+  width: 100%;
+  min-width: 0;
+}
+
+.filter-count-col {
+  align-items: stretch;
+  justify-content: stretch;
+}
+
+.table-count-pill,
+.income-filter-count,
+.expense-filter-count {
+  width: 100%;
+  min-width: 0;
+}
+
+.expense-ledger-card .section-title-row {
+  gap: 24px;
+}
+
+.expense-ledger-card .section-title-row > div:first-child {
+  flex: 1 1 240px;
+}
+
+.dashboard-filter-card .card-body {
+  padding: 18px 20px;
+}
+
+.dashboard-filter-toolbar > [class*="col-"]:first-child {
+  grid-column: auto;
+}
+
 @keyframes skeletonPulse {
   0% {
     background-position: 200% 0;

@@ -1,6 +1,7 @@
 import Student from "../models/Student.js";
 import Income from "../models/Income.js";
 import Expense from "../models/Expenses.js";
+import { applyPeriodDateFilter, getDateRangeForPeriod } from "../utils/dateFilterHelper.js";
 
 // Yo vaneko chai Helper function ho, jasle chai hamilai  date ko range dincha
 
@@ -21,75 +22,216 @@ const getDateRange = (period) => {
     return startDate ? { $gte: startDate, $lte: now } : null;
 };
 
-const getRecentMonthBuckets = (monthsBack = 5) => {
-    const now = new Date();
-    const buckets = [];
+const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
-    for (let index = monthsBack; index >= 0; index -= 1) {
-        const date = new Date(now.getFullYear(), now.getMonth() - index, 1);
-        const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+const getMonthKey = (year, month) => `${year}-${String(month).padStart(2, "0")}`;
+
+const getDayKey = (year, month, day) => `${getMonthKey(year, month)}-${String(day).padStart(2, "0")}`;
+
+const getSafeDate = (value) => {
+    const date = value ? new Date(value) : null;
+    return date && !Number.isNaN(date.getTime()) ? date : null;
+};
+
+const getDateFilterOptions = (query = {}) => ({
+    period: query.period || "",
+    day: query.day || "",
+    month: query.month || "",
+    year: query.year || "",
+    startDate: query.startDate || "",
+    endDate: query.endDate || "",
+});
+
+const applyDashboardDateFilter = (query, fieldName, filters = {}) => {
+    const startDate = getSafeDate(filters.startDate);
+    const endDate = getSafeDate(filters.endDate);
+
+    if (filters.startDate && !startDate) return { error: "Invalid start date." };
+    if (filters.endDate && !endDate) return { error: "Invalid end date." };
+
+    if (startDate || endDate) {
+        query[fieldName] = {};
+        if (startDate) query[fieldName].$gte = startDate;
+        if (endDate) query[fieldName].$lte = endDate;
+        return {};
+    }
+
+    if (filters.period) {
+        return applyPeriodDateFilter(query, fieldName, filters);
+    }
+
+    return {};
+};
+
+const createMonthlyBuckets = (startDate, endDate, includeYear = false) => {
+    const buckets = [];
+    const cursor = new Date(startDate.getFullYear(), startDate.getMonth(), 1);
+    const end = new Date(endDate.getFullYear(), endDate.getMonth(), 1);
+
+    while (cursor <= end) {
+        const year = cursor.getFullYear();
+        const month = cursor.getMonth() + 1;
 
         buckets.push({
-            key,
-            label: date.toLocaleString("en", { month: "short" }),
-            year: date.getFullYear(),
-            month: date.getMonth() + 1,
+            key: getMonthKey(year, month),
+            period: includeYear ? `${monthNames[month - 1]} ${year}` : monthNames[month - 1],
             income: 0,
             expenses: 0,
             profit: 0,
         });
+
+        cursor.setMonth(cursor.getMonth() + 1);
     }
 
     return buckets;
 };
 
-const getMonthlyTotals = async (Model, dateField, startDate) => (
+const createDailyBuckets = (startDate, endDate) => {
+    const buckets = [];
+    const cursor = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
+    const end = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
+
+    while (cursor <= end) {
+        const year = cursor.getFullYear();
+        const month = cursor.getMonth() + 1;
+        const day = cursor.getDate();
+
+        buckets.push({
+            key: getDayKey(year, month, day),
+            period: `${monthNames[month - 1]} ${day}`,
+            income: 0,
+            expenses: 0,
+            profit: 0,
+        });
+
+        cursor.setDate(cursor.getDate() + 1);
+    }
+
+    return buckets;
+};
+
+const getBoundaryTransactionDate = async (sortDirection) => {
+    const [income, expense] = await Promise.all([
+        Income.findOne().sort({ incomeDate: sortDirection }).select("incomeDate"),
+        Expense.findOne().sort({ expenseDate: sortDirection }).select("expenseDate"),
+    ]);
+    const dates = [income?.incomeDate, expense?.expenseDate].filter(Boolean).map((date) => new Date(date));
+
+    if (!dates.length) return null;
+
+    return sortDirection === 1
+        ? new Date(Math.min(...dates.map((date) => date.getTime())))
+        : new Date(Math.max(...dates.map((date) => date.getTime())));
+};
+
+const getTrendTotals = async (Model, dateField, startDate, endDate, bucketType) => (
     Model.aggregate([
         {
             $match: {
-                [dateField]: { $gte: startDate },
+                [dateField]: { $gte: startDate, $lte: endDate },
             },
         },
         {
             $group: {
-                _id: {
-                    year: { $year: `$${dateField}` },
-                    month: { $month: `$${dateField}` },
-                },
+                _id: bucketType === "day"
+                    ? {
+                        year: { $year: `$${dateField}` },
+                        month: { $month: `$${dateField}` },
+                        day: { $dayOfMonth: `$${dateField}` },
+                    }
+                    : {
+                        year: { $year: `$${dateField}` },
+                        month: { $month: `$${dateField}` },
+                    },
                 total: { $sum: "$amount" },
             },
         },
     ])
 );
 
-const buildMonthlyTrend = async () => {
-    const buckets = getRecentMonthBuckets();
-    const trendStart = new Date(buckets[0].year, buckets[0].month - 1, 1);
+const getTrendRange = async (filters = {}) => {
+    const normalizedPeriod = String(filters.period || "").trim().toLowerCase();
+    const customStart = getSafeDate(filters.startDate);
+    const customEnd = getSafeDate(filters.endDate);
+
+    if (normalizedPeriod && !["daily", "weekly", "monthly", "yearly"].includes(normalizedPeriod)) {
+        return { error: "Invalid period. Must be one of: daily, weekly, monthly, yearly" };
+    }
+
+    if (customStart || customEnd) {
+        const now = new Date();
+        return {
+            start: customStart || new Date(now.getFullYear(), 0, 1),
+            end: customEnd || now,
+            bucketType: customStart && customEnd && (customEnd - customStart) <= 62 * 24 * 60 * 60 * 1000 ? "day" : "month",
+            includeYear: true,
+        };
+    }
+
+    if (normalizedPeriod) {
+        const { start, end, error } = getDateRangeForPeriod(filters);
+        if (error) return { error };
+
+        return {
+            start,
+            end,
+            bucketType: normalizedPeriod === "daily" || normalizedPeriod === "weekly" || normalizedPeriod === "monthly" ? "day" : "month",
+            includeYear: false,
+        };
+    }
+
+    const now = new Date();
+    const oldest = await getBoundaryTransactionDate(1);
+    const newest = await getBoundaryTransactionDate(-1);
+    const start = oldest || new Date(now.getFullYear(), 0, 1);
+    const latest = newest && newest > now ? newest : now;
+
+    return {
+        start,
+        end: latest,
+        bucketType: "month",
+        includeYear: start.getFullYear() !== latest.getFullYear(),
+    };
+};
+
+const buildTrend = async (filters = {}) => {
+    const range = await getTrendRange(filters);
+    if (range.error) return { error: range.error };
+
+    const buckets = range.bucketType === "day"
+        ? createDailyBuckets(range.start, range.end)
+        : createMonthlyBuckets(range.start, range.end, range.includeYear);
     const [incomeTotals, expenseTotals] = await Promise.all([
-        getMonthlyTotals(Income, "incomeDate", trendStart),
-        getMonthlyTotals(Expense, "expenseDate", trendStart),
+        getTrendTotals(Income, "incomeDate", range.start, range.end, range.bucketType),
+        getTrendTotals(Expense, "expenseDate", range.start, range.end, range.bucketType),
     ]);
 
     const bucketMap = new Map(buckets.map((bucket) => [bucket.key, bucket]));
 
     incomeTotals.forEach((item) => {
-        const key = `${item._id.year}-${String(item._id.month).padStart(2, "0")}`;
+        const key = range.bucketType === "day"
+            ? getDayKey(item._id.year, item._id.month, item._id.day)
+            : getMonthKey(item._id.year, item._id.month);
         const bucket = bucketMap.get(key);
         if (bucket) bucket.income = item.total;
     });
 
     expenseTotals.forEach((item) => {
-        const key = `${item._id.year}-${String(item._id.month).padStart(2, "0")}`;
+        const key = range.bucketType === "day"
+            ? getDayKey(item._id.year, item._id.month, item._id.day)
+            : getMonthKey(item._id.year, item._id.month);
         const bucket = bucketMap.get(key);
         if (bucket) bucket.expenses = item.total;
     });
 
-    return buckets.map((bucket) => ({
-        period: bucket.label,
-        income: bucket.income,
-        expenses: bucket.expenses,
-        profit: bucket.income - bucket.expenses,
-    }));
+    return {
+        trends: buckets.map((bucket) => ({
+            period: bucket.period,
+            income: bucket.income,
+            expenses: bucket.expenses,
+            profit: bucket.income - bucket.expenses,
+        })),
+    };
 };
 
 
@@ -135,17 +277,26 @@ const getDashboardSummary = async (req, res) => {
 
 const getDashboardStatsByPeriod = async (req, res) => {
     try {
-        const { period = "daily" } = req.query;
+        const filters = getDateFilterOptions(req.query);
+        const normalizedPeriod = String(filters.period || "").trim().toLowerCase();
 
-        if (!["daily", "weekly", "monthly", "yearly"].includes(period)) {
+        if (normalizedPeriod && !["daily", "weekly", "monthly", "yearly"].includes(normalizedPeriod)) {
             return res.status(400).json({
                 message: "Invalid period. Must be one of: daily, weekly, monthly, yearly",
             });
         }
-        const dateFilter = getDateRange(period);
 
-        const incomes = await Income.find({ incomeDate: dateFilter });
-        const expenses = await Expense.find({ expenseDate: dateFilter });
+        const incomeQuery = {};
+        const expenseQuery = {};
+        const incomeFilter = applyDashboardDateFilter(incomeQuery, "incomeDate", filters);
+        if (incomeFilter.error) return res.status(400).json({ message: incomeFilter.error });
+        const expenseFilter = applyDashboardDateFilter(expenseQuery, "expenseDate", filters);
+        if (expenseFilter.error) return res.status(400).json({ message: expenseFilter.error });
+
+        const [incomes, expenses] = await Promise.all([
+            Income.find(incomeQuery),
+            Expense.find(expenseQuery),
+        ]);
 
         const totalIncome = incomes.reduce((sum, item) => sum + item.amount, 0);
         const totalExpenses = expenses.reduce((sum, item) => sum + item.amount, 0);
@@ -153,7 +304,7 @@ const getDashboardStatsByPeriod = async (req, res) => {
 
         return res.status(200).json({
             message: "Dashboard stats fetched successfully",
-            period,
+            period: normalizedPeriod || "all",
             stats: {
                 totalIncome,
                 totalExpenses,
@@ -202,6 +353,7 @@ const getRecentTransactions = async (req, res) => {
 
 const getDashboardOverview = async (req, res) => {
     try {
+        const filters = getDateFilterOptions(req.query);
         const totalStudents = await Student.countDocuments();
         const activeStudents = await Student.countDocuments({
             isActive: true,
@@ -240,7 +392,11 @@ const getDashboardOverview = async (req, res) => {
         const recentExpenses = await Expense.find()
             .sort({ expenseDate: -1, createdAt: -1 })
             .limit(5);
-        const trends = await buildMonthlyTrend();
+        const trendResult = await buildTrend(filters);
+
+        if (trendResult.error) {
+            return res.status(400).json({ message: trendResult.error });
+        }
 
         return res.status(200).json({
             message: "Dashboard overview fetched successfully",
@@ -287,7 +443,7 @@ const getDashboardOverview = async (req, res) => {
                     income: recentIncome,
                     expenses: recentExpenses,
                 },
-                trends,
+                trends: trendResult.trends,
             },
         });
     } catch (error) {

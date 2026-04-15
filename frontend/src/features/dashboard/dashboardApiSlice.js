@@ -11,9 +11,9 @@ export const dashboardApiSlice = apiSlice.injectEndpoints({
     }),
 
     getDashboardStatsByPeriod: builder.query({
-      query: (period = "daily") => ({
+      query: (params = {}) => ({
         url: `${DASHBOARD_URL}/stats`,
-        params: { period },
+        params,
       }),
       providesTags: ["Dashboard"],
     }),
@@ -26,8 +26,9 @@ export const dashboardApiSlice = apiSlice.injectEndpoints({
     }),
 
     getDashboardOverview: builder.query({
-      query: () => ({
+      query: (params = {}) => ({
         url: `${DASHBOARD_URL}/overview`,
+        params,
       }),
       providesTags: ["Dashboard"],
     }),
