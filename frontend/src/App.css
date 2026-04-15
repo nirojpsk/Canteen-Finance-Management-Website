@@ -3028,6 +3028,182 @@ body::after {
   width: 30%;
 }
 
+.admin-main,
+.content-area,
+.page-heading > *,
+.section-title-row > *,
+.summary-card,
+.summary-card .card-body,
+.panel-card,
+.ledger-card,
+.finance-hero,
+.mini-stat,
+.analytics-card,
+.analytics-chart-shell {
+  min-width: 0;
+}
+
+.topbar {
+  flex-wrap: wrap;
+}
+
+.topbar-left {
+  flex: 1 1 220px;
+}
+
+.topbar-actions {
+  flex: 1 1 380px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  min-width: 0;
+}
+
+.admin-chip span {
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.metric-pill {
+  max-width: 100%;
+  min-width: 0;
+  line-height: 1.25;
+  text-align: center;
+  white-space: normal;
+}
+
+.dashboard-metrics {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+  align-items: stretch;
+}
+
+.summary-value,
+.dashboard-metrics .summary-card:not(:first-child) .summary-value {
+  font-size: 28px;
+  letter-spacing: 0;
+  overflow-wrap: anywhere;
+  white-space: normal;
+  word-break: break-word;
+}
+
+.summary-helper {
+  flex-wrap: wrap;
+  overflow-wrap: anywhere;
+}
+
+.dashboard-ledgers {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
+  gap: 32px;
+}
+
+.dashboard-period-strip {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr));
+}
+
+.dashboard-period-strip > div {
+  min-width: 0;
+}
+
+.dashboard-period-strip strong,
+.finance-hero h3,
+.mini-stat strong,
+.income-hero-badges strong,
+.table-count-pill strong {
+  letter-spacing: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.finance-top-grid,
+.expenses-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 360px), 1fr));
+}
+
+.income-hero-badges {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 112px), 1fr));
+}
+
+.mini-stat-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 160px), 1fr));
+}
+
+.section-title-row {
+  flex-wrap: wrap;
+}
+
+.ledger-summary-strip {
+  width: min(100%, 420px);
+  min-width: 0;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 108px), 1fr));
+}
+
+.analytics-heading {
+  flex-wrap: wrap;
+}
+
+.analytics-controls {
+  flex: 1 1 280px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.analytics-controls .form-select {
+  flex: 1 1 134px;
+}
+
+.analytics-chart-shell {
+  width: 100%;
+  overflow: hidden;
+}
+
+.analytics-empty-state {
+  min-height: 280px;
+  display: grid;
+  place-content: center;
+  gap: 6px;
+  padding: 24px;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.analytics-empty-state strong {
+  color: var(--text-main);
+  font-size: 15px;
+  font-weight: 850;
+}
+
+.analytics-empty-state span {
+  font-size: 12px;
+}
+
+.students-chart-wrap {
+  grid-template-columns: minmax(0, 1fr) minmax(160px, 200px);
+}
+
+.income-table-shell,
+.expense-table-shell,
+.student-ledger .table-responsive {
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.data-table {
+  min-width: 720px;
+}
+
+.student-table {
+  min-width: 760px;
+}
+
+.identity-cell > span:last-child,
+.data-table strong,
+.data-table small {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
 @keyframes skeletonPulse {
   0% {
     background-position: 200% 0;

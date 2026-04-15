@@ -75,7 +75,7 @@ const IncomePage = () => {
   const [createIncome, createState] = useCreateIncomeMutation();
   const [deleteIncome, deleteState] = useDeleteIncomeMutation();
 
-  const incomes = incomeQuery.data?.incomes || [];
+  const incomes = useMemo(() => incomeQuery.data?.incomes || [], [incomeQuery.data?.incomes]);
 
   const incomeStats = useMemo(() => {
     const latestIncome = incomes.reduce((latest, entry) => {

@@ -44,34 +44,56 @@ const formatChartTick = (value) => {
   return value;
 };
 
+const getMetricLabel = (value) => chartMetricOptions.find((option) => option.value === value)?.label || "Value";
+
+const toChartNumber = (value) => Number(value || 0);
+
 const AnalyticsSection = ({ overview }) => {
   const [metric, setMetric] = useState("income");
   const [style, setStyle] = useState("bar");
 
-  const periodData = useMemo(
-    () =>
-      periodLabels.map(({ key, label }) => ({
-        period: label,
-        income: overview?.[key]?.income ?? 0,
-        expenses: overview?.[key]?.expenses ?? 0,
-        profit: overview?.[key]?.profit ?? 0,
-      })),
-    [overview],
-  );
+  const periodData = useMemo(() => {
+    const trends = Array.isArray(overview?.trends) ? overview.trends : [];
+
+    if (trends.length) {
+      return trends.map((item, index) => {
+        const income = toChartNumber(item.income);
+        const expenses = toChartNumber(item.expenses);
+
+        return {
+          period: item.period || item.label || `Period ${index + 1}`,
+          income,
+          expenses,
+          profit: item.profit === undefined ? income - expenses : toChartNumber(item.profit),
+        };
+      });
+    }
+
+    return periodLabels.map(({ key, label }) => ({
+      period: label,
+      income: toChartNumber(overview?.[key]?.income),
+      expenses: toChartNumber(overview?.[key]?.expenses),
+      profit: toChartNumber(overview?.[key]?.profit),
+    }));
+  }, [overview]);
 
   const studentData = useMemo(
     () => [
-      { name: "Active", value: overview?.students?.active ?? 0 },
-      { name: "Inactive", value: overview?.students?.inactive ?? 0 },
-      { name: "Total", value: overview?.students?.total ?? 0 },
+      { name: "Active", value: toChartNumber(overview?.students?.active) },
+      { name: "Inactive", value: toChartNumber(overview?.students?.inactive) },
     ],
     [overview],
   );
 
   const isStudentMetric = metric === "students";
-  const totalStudents = overview?.students?.total ?? 0;
+  const totalStudents = toChartNumber(overview?.students?.total);
+  const visibleStudentSlices = studentData.filter((item) => item.value > 0);
+  const hasChartData = isStudentMetric
+    ? visibleStudentSlices.length > 0
+    : periodData.some((item) => Math.abs(toChartNumber(item[metric])) > 0);
 
   const chartColor = metric === "expenses" ? "#f87171" : metric === "profit" ? "#34d399" : "#4f8cff";
+  const metricLabel = getMetricLabel(metric);
 
   return (
     <Card className="panel-card analytics-card">
@@ -111,12 +133,17 @@ const AnalyticsSection = ({ overview }) => {
         </div>
 
         <div className="analytics-chart-shell">
-          {isStudentMetric ? (
+          {!hasChartData ? (
+            <div className="analytics-empty-state">
+              <strong>No {metricLabel.toLowerCase()} data yet</strong>
+              <span>Recorded totals will appear here automatically.</span>
+            </div>
+          ) : isStudentMetric ? (
             <div className="students-chart-wrap">
               <ResponsiveContainer width="100%" height={280}>
                 <PieChart>
-                  <Pie data={studentData} dataKey="value" nameKey="name" innerRadius={62} outerRadius={94}>
-                    {studentData.map((slice, index) => (
+                  <Pie data={visibleStudentSlices} dataKey="value" nameKey="name" innerRadius={62} outerRadius={94}>
+                    {visibleStudentSlices.map((slice, index) => (
                       <Cell key={slice.name} fill={studentSliceColors[index % studentSliceColors.length]} />
                     ))}
                   </Pie>
@@ -141,7 +168,7 @@ const AnalyticsSection = ({ overview }) => {
                 <XAxis dataKey="period" tickLine={false} axisLine={false} />
                 <YAxis tickFormatter={formatChartTick} tickLine={false} axisLine={false} width={70} />
                 <Tooltip
-                  formatter={(value) => [formatCurrency(Number(value || 0)), chartMetricOptions.find((m) => m.value === metric)?.label]}
+                  formatter={(value) => [formatCurrency(Number(value || 0)), metricLabel]}
                 />
                 <Line
                   type="monotone"
@@ -160,7 +187,7 @@ const AnalyticsSection = ({ overview }) => {
                 <XAxis dataKey="period" tickLine={false} axisLine={false} />
                 <YAxis tickFormatter={formatChartTick} tickLine={false} axisLine={false} width={70} />
                 <Tooltip
-                  formatter={(value) => [formatCurrency(Number(value || 0)), chartMetricOptions.find((m) => m.value === metric)?.label]}
+                  formatter={(value) => [formatCurrency(Number(value || 0)), metricLabel]}
                 />
                 <Bar dataKey={metric} fill={chartColor} radius={[8, 8, 0, 0]} maxBarSize={52} />
               </BarChart>

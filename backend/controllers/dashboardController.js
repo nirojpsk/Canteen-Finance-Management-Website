@@ -21,6 +21,77 @@ const getDateRange = (period) => {
     return startDate ? { $gte: startDate, $lte: now } : null;
 };
 
+const getRecentMonthBuckets = (monthsBack = 5) => {
+    const now = new Date();
+    const buckets = [];
+
+    for (let index = monthsBack; index >= 0; index -= 1) {
+        const date = new Date(now.getFullYear(), now.getMonth() - index, 1);
+        const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+
+        buckets.push({
+            key,
+            label: date.toLocaleString("en", { month: "short" }),
+            year: date.getFullYear(),
+            month: date.getMonth() + 1,
+            income: 0,
+            expenses: 0,
+            profit: 0,
+        });
+    }
+
+    return buckets;
+};
+
+const getMonthlyTotals = async (Model, dateField, startDate) => (
+    Model.aggregate([
+        {
+            $match: {
+                [dateField]: { $gte: startDate },
+            },
+        },
+        {
+            $group: {
+                _id: {
+                    year: { $year: `$${dateField}` },
+                    month: { $month: `$${dateField}` },
+                },
+                total: { $sum: "$amount" },
+            },
+        },
+    ])
+);
+
+const buildMonthlyTrend = async () => {
+    const buckets = getRecentMonthBuckets();
+    const trendStart = new Date(buckets[0].year, buckets[0].month - 1, 1);
+    const [incomeTotals, expenseTotals] = await Promise.all([
+        getMonthlyTotals(Income, "incomeDate", trendStart),
+        getMonthlyTotals(Expense, "expenseDate", trendStart),
+    ]);
+
+    const bucketMap = new Map(buckets.map((bucket) => [bucket.key, bucket]));
+
+    incomeTotals.forEach((item) => {
+        const key = `${item._id.year}-${String(item._id.month).padStart(2, "0")}`;
+        const bucket = bucketMap.get(key);
+        if (bucket) bucket.income = item.total;
+    });
+
+    expenseTotals.forEach((item) => {
+        const key = `${item._id.year}-${String(item._id.month).padStart(2, "0")}`;
+        const bucket = bucketMap.get(key);
+        if (bucket) bucket.expenses = item.total;
+    });
+
+    return buckets.map((bucket) => ({
+        period: bucket.label,
+        income: bucket.income,
+        expenses: bucket.expenses,
+        profit: bucket.income - bucket.expenses,
+    }));
+};
+
 
 // Get full dashboard data
 
@@ -169,6 +240,7 @@ const getDashboardOverview = async (req, res) => {
         const recentExpenses = await Expense.find()
             .sort({ expenseDate: -1, createdAt: -1 })
             .limit(5);
+        const trends = await buildMonthlyTrend();
 
         return res.status(200).json({
             message: "Dashboard overview fetched successfully",
@@ -215,6 +287,7 @@ const getDashboardOverview = async (req, res) => {
                     income: recentIncome,
                     expenses: recentExpenses,
                 },
+                trends,
             },
         });
     } catch (error) {

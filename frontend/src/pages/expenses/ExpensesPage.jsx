@@ -73,7 +73,7 @@ const ExpensesPage = () => {
   const [createExpense, createState] = useCreateExpenseMutation();
   const [deleteExpense, deleteState] = useDeleteExpenseMutation();
 
-  const expenses = expensesQuery.data?.expenses || [];
+  const expenses = useMemo(() => expensesQuery.data?.expenses || [], [expensesQuery.data?.expenses]);
 
   const expenseStats = useMemo(() => {
     const latestExpense = expenses.reduce((latest, entry) => {
@@ -288,7 +288,7 @@ const ExpensesPage = () => {
             />
             <div className="ledger-footer">
               View full transaction history
-              {expenseStats.latestExpense ? ` · Latest: ${formatDate(expenseStats.latestExpense.expenseDate)}` : ""}
+              {expenseStats.latestExpense ? ` - Latest: ${formatDate(expenseStats.latestExpense.expenseDate)}` : ""}
             </div>
             </Card.Body>
           </Card>
