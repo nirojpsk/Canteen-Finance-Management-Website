@@ -72,7 +72,7 @@ const getAllStudents = async (req, res) => {
         }
 
         if (className.trim()) {
-            query.className = { $regex: `^{className.trim()}$`, $options: "i" }; // exact match for className
+            query.className = { $regex: `^${className.trim()}$`, $options: "i" }; // exact match for className
         }
 
         if (status === "active") {
@@ -81,7 +81,7 @@ const getAllStudents = async (req, res) => {
             query.isActive = false;
         }
 
-        const students = (await Student.find(query)).toSorted({ createdAt: -1 }); // createdAt field ko basis ma students lai descending order ma sort garna madat garxa
+        const students = await Student.find(query).sort({ createdAt: -1 }); // createdAt field ko basis ma students lai descending order ma sort garna madat garxa
 
         res.status(200).json({
             message: "Students fetched successfully",
@@ -161,7 +161,7 @@ const updateStudent = async (req, res) => {
         if (phone !== undefined) student.phone = phone.trim();
         if (address !== undefined) student.address = address.trim();
         if (note !== undefined) student.note = note.trim();
-        if (typeof isActive !== undefined) student.isActive = isActive;
+        if (isActive !== undefined) student.isActive = isActive;
 
         const updatedStudent = await student.save();
 
@@ -218,6 +218,10 @@ const getStudentIncomeHistory = async (req, res) => {
     try {
 
         const { id } = req.params;
+        const {
+            paymentMethod = "",
+            period = "",
+        } = req.query;
 
         if (!mongoose.Types.ObjectId.isValid(id)) {
             return res.status(400).json({
@@ -234,21 +238,24 @@ const getStudentIncomeHistory = async (req, res) => {
 
         const incomeQuery = { student: id };
 
-        if (PaymentMethod.trim()) {
-            incomeQuery.paymentMethod = paymentMethod.trim().toLowerCase();
+        const normalizedPaymentMethod = paymentMethod.trim().toLowerCase();
+        const normalizedPeriod = period.trim().toLowerCase();
+
+        if (normalizedPaymentMethod) {
+            incomeQuery.paymentMethod = normalizedPaymentMethod;
         }
 
-        if (period) {
+        if (normalizedPeriod) {
             const now = new Date();
             let startDate = null;
-            if (period === "daily") {
+            if (normalizedPeriod === "daily") {
                 startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-            } else if (period === "weekly") {
+            } else if (normalizedPeriod === "weekly") {
                 startDate = new Date(now);
                 startDate.setDate(now.getDate() - 7);
-            } else if (period === "monthly") {
+            } else if (normalizedPeriod === "monthly") {
                 startDate = new Date(now.getFullYear(), now.getMonth(), 1);
-            } else if (period === "yearly") {
+            } else if (normalizedPeriod === "yearly") {
                 startDate = new Date(now.getFullYear(), 0, 1);
             }
             if (startDate){
