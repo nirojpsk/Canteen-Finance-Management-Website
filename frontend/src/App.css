@@ -68,15 +68,24 @@ body {
 .brand-mark {
   display: inline-grid;
   place-items: center;
-  color: #ffffff;
-  background: var(--ink);
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.14);
   border-radius: 4px;
+  overflow: hidden;
 }
 
 .auth-brand-mark {
   width: 48px;
   height: 48px;
   margin-bottom: 22px;
+}
+
+.auth-brand-logo-image {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
 }
 
 .auth-brand h1 {
@@ -343,11 +352,14 @@ textarea.form-control {
   width: 32px;
   height: 32px;
   border-radius: 8px;
-  background: linear-gradient(135deg, var(--ink), var(--blue));
-  box-shadow: 0 4px 10px rgba(15, 23, 42, 0.2);
-  display: inline-grid;
-  place-items: center;
-  color: #fff;
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.16);
+}
+
+.brand-logo-image {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
 }
 
 .brand strong,
@@ -2042,6 +2054,48 @@ textarea.form-control {
 .modal-header,
 .modal-footer {
   border: 0;
+}
+
+.confirmation-modal .modal-content {
+  background: var(--panel-bg);
+  color: var(--text-main);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 24px 70px rgba(9, 14, 26, 0.28);
+}
+
+.confirmation-modal .modal-header {
+  padding: 18px 18px 8px;
+}
+
+.confirmation-modal .modal-title {
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 30px;
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.confirmation-modal .modal-body {
+  padding: 10px 18px 22px;
+  color: var(--text-main);
+  font-size: 18px;
+  line-height: 1.5;
+}
+
+.confirmation-modal .modal-footer {
+  padding: 0 18px 18px;
+  gap: 10px;
+}
+
+[data-theme="dark"] .confirmation-modal .modal-content {
+  background: rgba(24, 31, 46, 0.96);
+  border-color: rgba(130, 149, 185, 0.26);
+}
+
+[data-theme="dark"] .confirmation-modal .modal-title,
+[data-theme="dark"] .confirmation-modal .modal-body {
+  color: #dce7ff;
 }
 
 /* Premium visual refresh */

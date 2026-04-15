@@ -4,7 +4,7 @@ import Card from "react-bootstrap/Card";
 import Form from "react-bootstrap/Form";
 import { useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
-import { FiAtSign, FiCreditCard, FiLock, FiShield } from "react-icons/fi";
+import { FiAtSign, FiLock, FiShield } from "react-icons/fi";
 import Message from "../../components/common/Message";
 import { useLoginAdminMutation } from "../../features/auth/authApiSlice";
 import getErrorMessage from "../../utils/getErrorMessage";
@@ -48,7 +48,7 @@ const LoginPage = () => {
         <Card.Body>
           <div className="auth-brand">
             <span className="auth-brand-mark">
-              <FiCreditCard aria-hidden="true" />
+              <img src="/schoollogo.png" alt="School logo" className="auth-brand-logo-image" />
             </span>
             <h1>Canteen Finance</h1>
           </div>

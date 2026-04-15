@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import Income from "../models/Income.js";
 import Student from "../models/Student.js";
+import { applyPeriodDateFilter } from "../utils/dateFilterHelper.js";
 
 // Create a new Income
 
@@ -67,6 +68,9 @@ const getAllIncome = async (req, res) => {
             search = "",
             paymentMethod = "",
             period = "",
+            day = "",
+            month = "",
+            year = "",
             studentId = "",
             startDate = "",
             endDate = "",
@@ -93,21 +97,15 @@ const getAllIncome = async (req, res) => {
             if (startDate) query.incomeDate.$gte = new Date(startDate);
             if (endDate) query.incomeDate.$lte = new Date(endDate);
         } else if (period) {
-            const now = new Date();
-            let start = null;
+            const { error } = applyPeriodDateFilter(query, "incomeDate", {
+                period,
+                day,
+                month,
+                year,
+            });
 
-            if (period === "daily") {
-                start = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-            } else if (period === "weekly") {
-                start = new Date(now);
-                start.setDate(now.getDate() - 7);
-            } else if (period === "monthly") {
-                start = new Date(now.getFullYear(), now.getMonth(), 1);
-            } else if (period === "yearly") {
-                start = new Date(now.getFullYear(), 0, 1);
-            }
-            if (start) {
-                query.incomeDate = { $gte: start, $lte: now };
+            if (error) {
+                return res.status(400).json({ message: error });
             }
         }
         let incomes = await Income.find(query)
@@ -285,29 +283,23 @@ const deleteIncome = async (req, res) => {
 
 const getIncomeSummary = async (req, res) => {
     try {
-        const { period = "", startDate = "", endDate = "" } = req.query;
+        const { period = "", day = "", month = "", year = "", startDate = "", endDate = "" } = req.query;
         const query = {};
-
-        const now = new Date();
 
         if (startDate || endDate) {
             query.incomeDate = {};
             if (startDate) query.incomeDate.$gte = new Date(startDate);
             if (endDate) query.incomeDate.$lte = new Date(endDate);
         } else if (period) {
-            let start = null;
-            if (period === "daily") {
-                start = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-            } else if (period === "weekly") {
-                start = new Date(now);
-                start.setDate(now.getDate() - 7);
-            } else if (period === "monthly") {
-                start = new Date(now.getFullYear(), now.getMonth(), 1);
-            } else if (period === "yearly") {
-                start = new Date(now.getFullYear(), 0, 1);
-            }
-            if (start) {
-                query.incomeDate = { $gte: start, $lte: now };
+            const { error } = applyPeriodDateFilter(query, "incomeDate", {
+                period,
+                day,
+                month,
+                year,
+            });
+
+            if (error) {
+                return res.status(400).json({ message: error });
             }
         }
         const incomes = await Income.find(query)

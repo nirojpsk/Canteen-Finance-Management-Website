@@ -88,7 +88,7 @@ const StudentTable = ({ students = [], onToggleStatus, togglingId = "", isLoadin
                   variant="outline-warning"
                   size="sm"
                   title="Toggle status"
-                  onClick={() => onToggleStatus(student._id)}
+                  onClick={() => onToggleStatus(student)}
                   disabled={togglingId === student._id}
                 >
                   <FiRefreshCw aria-hidden="true" />

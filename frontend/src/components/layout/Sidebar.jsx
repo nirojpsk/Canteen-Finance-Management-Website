@@ -1,7 +1,6 @@
 import { createElement } from "react";
 import { NavLink } from "react-router-dom";
 import {
-  FiBarChart2,
   FiCreditCard,
   FiLayers,
   FiHome,
@@ -23,7 +22,7 @@ const Sidebar = () => (
   <aside className="sidebar">
     <div className="brand">
       <span className="brand-mark">
-        <FiBarChart2 aria-hidden="true" />
+        <img src="/schoollogo.png" alt="School logo" className="brand-logo-image" />
       </span>
       <span>
         <strong>Canteen Finance</strong>

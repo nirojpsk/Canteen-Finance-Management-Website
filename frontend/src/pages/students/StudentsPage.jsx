@@ -4,6 +4,7 @@ import Col from "react-bootstrap/Col";
 import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 import { FiUserPlus } from "react-icons/fi";
+import ConfirmationModal from "../../components/common/ConfirmationModal";
 import Loader from "../../components/common/Loader";
 import Message from "../../components/common/Message";
 import StudentForm from "../../components/students/StudentForm";
@@ -20,6 +21,7 @@ const StudentsPage = () => {
   const [formMessage, setFormMessage] = useState("");
   const [formError, setFormError] = useState("");
   const [togglingId, setTogglingId] = useState("");
+  const [pendingStatusChange, setPendingStatusChange] = useState(null);
 
   const queryParams = useMemo(
     () => Object.fromEntries(Object.entries(filters).filter(([, value]) => value)),
@@ -47,7 +49,10 @@ const StudentsPage = () => {
     }
   };
 
-  const handleToggleStatus = async (id) => {
+  const handleToggleStatus = async () => {
+    if (!pendingStatusChange?.id) return;
+
+    const { id } = pendingStatusChange;
     setTogglingId(id);
     try {
       await toggleStatus(id).unwrap();
@@ -55,6 +60,7 @@ const StudentsPage = () => {
       setFormError(getErrorMessage(error, "Unable to update student status"));
     } finally {
       setTogglingId("");
+      setPendingStatusChange(null);
     }
   };
 
@@ -136,7 +142,7 @@ const StudentsPage = () => {
             </Message>
             <StudentTable
               students={studentsQuery.data?.students || []}
-              onToggleStatus={handleToggleStatus}
+              onToggleStatus={(student) => setPendingStatusChange({ id: student._id, isActive: student.isActive })}
               togglingId={togglingId}
               isLoading={studentsQuery.isLoading}
             />
@@ -144,6 +150,21 @@ const StudentsPage = () => {
               Showing <strong>{studentsQuery.data?.students?.length || 0}</strong> students
             </div>
           </section>
+
+          <ConfirmationModal
+            show={Boolean(pendingStatusChange)}
+            title={pendingStatusChange?.isActive ? "Archive student" : "Activate student"}
+            message={
+              pendingStatusChange?.isActive
+                ? "Are u sure, u want to delete?"
+                : "Are you sure you want to activate this student?"
+            }
+            confirmLabel={pendingStatusChange?.isActive ? "Archive" : "Activate"}
+            confirmVariant={pendingStatusChange?.isActive ? "danger" : "primary"}
+            isLoading={togglingId === pendingStatusChange?.id}
+            onCancel={() => setPendingStatusChange(null)}
+            onConfirm={handleToggleStatus}
+          />
         </div>
       </div>
     </section>

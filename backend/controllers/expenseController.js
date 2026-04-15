@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import Expense from '../models/Expenses.js';
+import { applyPeriodDateFilter } from '../utils/dateFilterHelper.js';
 
 // Create a new expense
 
@@ -44,6 +45,9 @@ const getAllExpenses = async (req, res) => {
             search = "",
             category = "",
             period = "",
+            day = "",
+            month = "",
+            year = "",
             startDate = "",
             endDate = "",
         } = req.query;
@@ -64,21 +68,15 @@ const getAllExpenses = async (req, res) => {
             }
 
         } else if (period) {
-            const now = new Date();
-            let start = null;
+            const { error } = applyPeriodDateFilter(query, "expenseDate", {
+                period,
+                day,
+                month,
+                year,
+            });
 
-            if (period === "daily") {
-                start = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-            } else if (period === "weekly") {
-                start = new Date(now);
-                start.setDate(now.getDate() - 7);
-            } else if (period === "monthly") {
-                start = new Date(now.getFullYear(), now.getMonth(), 1);
-            } else if (period === "yearly") {
-                start = new Date(now.getFullYear(), 0, 1);
-            }
-            if (start) {
-                query.expenseDate = { $gte: start, $lte: now };
+            if (error) {
+                return res.status(400).json({ message: error });
             }
         }
         let expenses = await Expense.find(query)
@@ -229,31 +227,29 @@ const getExpenseSummary = async (req, res) => {
     try {
         const {
             period = "",
+            day = "",
+            month = "",
+            year = "",
             startDate = "",
             endDate = "",
         } = req.query;
 
         const query = {};
-        const now = new Date(); //yesle chai now vanne variable ma current date and time store garcha
 
         if (startDate || endDate) {
             query.expenseDate = {};
             if (startDate) query.expenseDate.$gte = new Date(startDate);
             if (endDate) query.expenseDate.$lte = new Date(endDate);
         } else if (period) {
-            let start = null;
-            if (period === "daily") {
-                start = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-            } else if (period === "weekly") {
-                start = new Date(now);
-                start.setDate(now.getDate() - 7);
-            } else if (period === "monthly") {
-                start = new Date(now.getFullYear(), now.getMonth(), 1);
-            } else if (period === "yearly") {
-                start = new Date(now.getFullYear(), 0, 1);
-            }
-            if (start) {
-                query.expenseDate = { $gte: start, $lte: now };
+            const { error } = applyPeriodDateFilter(query, "expenseDate", {
+                period,
+                day,
+                month,
+                year,
+            });
+
+            if (error) {
+                return res.status(400).json({ message: error });
             }
         }
         const expenses = await Expense.find(query);

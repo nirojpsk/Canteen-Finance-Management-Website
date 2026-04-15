@@ -15,12 +15,63 @@ import {
 import { formatCurrency } from "../../utils/formatCurrency";
 import getErrorMessage from "../../utils/getErrorMessage";
 
+const monthOptions = [
+  { value: "1", label: "January" },
+  { value: "2", label: "February" },
+  { value: "3", label: "March" },
+  { value: "4", label: "April" },
+  { value: "5", label: "May" },
+  { value: "6", label: "June" },
+  { value: "7", label: "July" },
+  { value: "8", label: "August" },
+  { value: "9", label: "September" },
+  { value: "10", label: "October" },
+  { value: "11", label: "November" },
+  { value: "12", label: "December" },
+];
+
 const StudentDetailsPage = () => {
   const { id } = useParams();
-  const [period, setPeriod] = useState("");
+  const [historyFilters, setHistoryFilters] = useState({ period: "", day: "", month: "", year: "" });
   const studentQuery = useGetStudentByIdQuery(id);
-  const historyQuery = useGetStudentIncomeHistoryQuery({ id, period });
+  const historyParams = {
+    id,
+    period: historyFilters.period,
+  };
+
+  if (historyFilters.period === "daily" && historyFilters.day) {
+    historyParams.day = historyFilters.day;
+  }
+
+  if (historyFilters.period === "monthly") {
+    if (historyFilters.month) historyParams.month = historyFilters.month;
+    if (historyFilters.year) historyParams.year = historyFilters.year;
+  }
+
+  if (historyFilters.period === "yearly" && historyFilters.year) {
+    historyParams.year = historyFilters.year;
+  }
+
+  const historyQuery = useGetStudentIncomeHistoryQuery(historyParams);
   const student = studentQuery.data?.student;
+
+  const handleHistoryFilterChange = (event) => {
+    const { name, value } = event.target;
+
+    setHistoryFilters((current) => {
+      if (name !== "period") {
+        return { ...current, [name]: value };
+      }
+
+      return {
+        ...current,
+        period: value,
+        day: "",
+        month: "",
+        year: "",
+      };
+    });
+  };
 
   return (
     <section className="page-stack student-detail-screen">
@@ -91,8 +142,9 @@ const StudentDetailsPage = () => {
               </div>
               <Form.Select
                 className="period-select"
-                value={period}
-                onChange={(event) => setPeriod(event.target.value)}
+                name="period"
+                value={historyFilters.period}
+                onChange={handleHistoryFilterChange}
                 aria-label="Income history period"
               >
                 <option value="">All time</option>
@@ -102,6 +154,60 @@ const StudentDetailsPage = () => {
                 <option value="yearly">Yearly</option>
               </Form.Select>
             </div>
+            {historyFilters.period === "daily" ? (
+              <Form.Control
+                type="date"
+                name="day"
+                value={historyFilters.day}
+                onChange={handleHistoryFilterChange}
+                aria-label="Choose day"
+                className="period-select mt-2"
+              />
+            ) : null}
+            {historyFilters.period === "monthly" ? (
+              <div className="d-flex gap-2 mt-2">
+                <Form.Select
+                  name="month"
+                  value={historyFilters.month}
+                  onChange={handleHistoryFilterChange}
+                  aria-label="Choose month"
+                  className="period-select"
+                >
+                  <option value="">Month</option>
+                  {monthOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </Form.Select>
+                <Form.Control
+                  type="number"
+                  min="1900"
+                  max="3000"
+                  step="1"
+                  name="year"
+                  value={historyFilters.year}
+                  onChange={handleHistoryFilterChange}
+                  placeholder="Year"
+                  aria-label="Choose year"
+                  className="period-select"
+                />
+              </div>
+            ) : null}
+            {historyFilters.period === "yearly" ? (
+              <Form.Control
+                type="number"
+                min="1900"
+                max="3000"
+                step="1"
+                name="year"
+                value={historyFilters.year}
+                onChange={handleHistoryFilterChange}
+                placeholder="Year"
+                aria-label="Choose year"
+                className="period-select mt-2"
+              />
+            ) : null}
             {historyQuery.isFetching ? <Loader label="Loading history" /> : null}
             <StudentHistoryTable items={historyQuery.data?.incomeHistory || []} />
             <div className="history-total">

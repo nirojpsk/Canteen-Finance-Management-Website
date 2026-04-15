@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import Student from "../models/Student.js";
 import Income from "../models/Income.js";
+import { applyPeriodDateFilter } from "../utils/dateFilterHelper.js";
 
 // Create a new Student
 
@@ -221,6 +222,9 @@ const getStudentIncomeHistory = async (req, res) => {
         const {
             paymentMethod = "",
             period = "",
+            day = "",
+            month = "",
+            year = "",
         } = req.query;
 
         if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -246,20 +250,15 @@ const getStudentIncomeHistory = async (req, res) => {
         }
 
         if (normalizedPeriod) {
-            const now = new Date();
-            let startDate = null;
-            if (normalizedPeriod === "daily") {
-                startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-            } else if (normalizedPeriod === "weekly") {
-                startDate = new Date(now);
-                startDate.setDate(now.getDate() - 7);
-            } else if (normalizedPeriod === "monthly") {
-                startDate = new Date(now.getFullYear(), now.getMonth(), 1);
-            } else if (normalizedPeriod === "yearly") {
-                startDate = new Date(now.getFullYear(), 0, 1);
-            }
-            if (startDate){
-                incomeQuery.incomeDate = { $gte: startDate, $lte: now};
+            const { error } = applyPeriodDateFilter(incomeQuery, "incomeDate", {
+                period: normalizedPeriod,
+                day,
+                month,
+                year,
+            });
+
+            if (error) {
+                return res.status(400).json({ message: error });
             }
         }
 

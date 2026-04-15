@@ -2,6 +2,7 @@ import Card from "react-bootstrap/Card";
 import Button from "react-bootstrap/Button";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { FiArchive, FiArrowLeft, FiCamera } from "react-icons/fi";
+import ConfirmationModal from "../../components/common/ConfirmationModal";
 import Loader from "../../components/common/Loader";
 import Message from "../../components/common/Message";
 import StudentForm from "../../components/students/StudentForm";
@@ -18,6 +19,7 @@ const EditStudentPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [errorMessage, setErrorMessage] = useState("");
+  const [showArchiveConfirm, setShowArchiveConfirm] = useState(false);
   const studentQuery = useGetStudentByIdQuery(id);
   const [updateStudent, updateState] = useUpdateStudentMutation();
   const [toggleStudentStatus, toggleState] = useToggleStudentStatusMutation();
@@ -37,6 +39,7 @@ const EditStudentPage = () => {
     setErrorMessage("");
     try {
       await toggleStudentStatus(id).unwrap();
+      setShowArchiveConfirm(false);
     } catch (error) {
       setErrorMessage(getErrorMessage(error, "Unable to archive student"));
     }
@@ -120,7 +123,7 @@ const EditStudentPage = () => {
               <Button
                 type="button"
                 variant="outline-danger"
-                onClick={handleArchive}
+                onClick={() => setShowArchiveConfirm(true)}
                 disabled={toggleState.isLoading}
               >
                 <FiArchive aria-hidden="true" />
@@ -130,6 +133,16 @@ const EditStudentPage = () => {
           </Card.Body>
         </Card>
       </div>
+
+      <ConfirmationModal
+        show={showArchiveConfirm}
+        title="Archive student"
+        message="Are u sure, u want to delete?"
+        confirmLabel="Archive"
+        isLoading={toggleState.isLoading}
+        onCancel={() => setShowArchiveConfirm(false)}
+        onConfirm={handleArchive}
+      />
     </section>
   );
 };
